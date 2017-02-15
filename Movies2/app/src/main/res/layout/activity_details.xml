@@ -1,77 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tool="http://schemas.android.com/tools"
     android:id="@+id/activity_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/tv_movie_title"
+    <fragment
+        android:name="com.sixtytwentypeaks.movies.DetailsFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:background="@color/colorMovieTitleBackground"
-        android:fontFamily="sans-serif"
-        android:padding="20dp"
-        android:textAlignment="textStart"
-        android:textColor="@android:color/white"
-        android:textSize="45sp"
-        tool:text="Title" />
-    <!-- TODO add scrolling to the bottom part of the details screen -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:paddingTop="20dp">
-
-                <ImageView
-                    android:id="@+id/iv_poster"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingLeft="20dp">
-
-                    <TextView
-                        android:id="@+id/tv_movie_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        tool:text="2017" />
-
-                    <TextView
-                        android:id="@+id/tv_movie_rate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        tool:text="8.0/10" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_movie_synopsis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:textSize="16sp"
-                tool:text="Lorem ipsum color..." />
-        </LinearLayout>
-    </ScrollView>
-
+        android:layout_height="match_parent"/>
 </LinearLayout>

@@ -4,4 +4,7 @@
     <string name="action_top_rated_movies">Top Rated Movies</string>
     <string name="error_offline">Upps! You don\'t have Internet connection at the moment.</string>
     <string name="label_activity_details">Movie Detail</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
