@@ -3,7 +3,9 @@ package com.sixtytwentypeaks.movies.utils;
 import android.net.Uri;
 
 import com.sixtytwentypeaks.movies.BuildConfig;
-import com.sixtytwentypeaks.movies.data.Movie;
+import com.sixtytwentypeaks.movies.model.Movie;
+import com.sixtytwentypeaks.movies.model.Review;
+import com.sixtytwentypeaks.movies.model.Trailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +61,18 @@ public class TMDBUtils {
 
     public final static String PARAM_PAGE = "page";
 
+    public final static String ID_TEMPLATE = "{id}";
+
+    /**
+     * List of videos associated to a movie with given id = {id}
+     */
+    public final static String TRAILERS_TEMPLATE_PATH = "movie/" + ID_TEMPLATE + "/videos";
+
+    /**
+     * List of user reviews associated to a movie with given id = {id}
+     */
+    public final static String REVIEWS_TEMPLATE_PATH = "movie/" + ID_TEMPLATE + "/reviews";
+
 
     /****************************
      * Poster path URL constants
@@ -76,12 +90,6 @@ public class TMDBUtils {
      * JSON strings
      ****************************/
     private final static String RESULT = "results";
-    private final static String ID = "id";
-    private final static String TITLE = "original_title";
-    private final static String SYNOPSIS = "overview";
-    private final static String RATING = "vote_average";
-    private final static String DATE = "release_date";
-    private final static String POSTER_PATH = "poster_path";
 
 
     public static String getApiKey() {
@@ -114,6 +122,12 @@ public class TMDBUtils {
         return posterPaths;
     }
 
+    /**
+     * Given a JSON response, this method parses the data and returns the result
+     * as a list of Movie objects
+     * @param response
+     * @return
+     */
     public static List<Movie> buildMovieList(String response) {
         List<Movie> movieList = new ArrayList<Movie>();
         try {
@@ -124,12 +138,12 @@ public class TMDBUtils {
                 for (int i = 0; i < jsonMovies.length(); i++) {
                     JSONObject jsonMovie = jsonMovies.getJSONObject(i);
                     Movie movie = new Movie();
-                    movie.setId(jsonMovie.getString(ID));
-                    movie.setTitle(jsonMovie.getString(TITLE));
-                    movie.setSynopsis(jsonMovie.getString(SYNOPSIS));
-                    movie.setReleaseDate(jsonMovie.getString(DATE));
-                    movie.setRating(jsonMovie.getString(RATING));
-                    movie.setPosterURL(buildPosterPathUrl(jsonMovie.getString(POSTER_PATH)));
+                    movie.setId(jsonMovie.getString(Movie.ID));
+                    movie.setTitle(jsonMovie.getString(Movie.TITLE));
+                    movie.setSynopsis(jsonMovie.getString(Movie.SYNOPSIS));
+                    movie.setReleaseDate(jsonMovie.getString(Movie.DATE));
+                    movie.setRating(jsonMovie.getString(Movie.RATING));
+                    movie.setPosterURL(buildPosterPathUrl(jsonMovie.getString(Movie.POSTER_PATH)));
                     movieList.add(movie);
                 }
             }
@@ -137,6 +151,64 @@ public class TMDBUtils {
             e.printStackTrace();
         }
         return movieList;
+    }
+
+    /**
+     * Given a JSON response, this method parses the data and returns the result
+     * as a list of Review objects
+     * @param response
+     * @return
+     */
+    public static List<Review> buildReviewList(String response) {
+        List<Review> reviewList = new ArrayList<>();
+        try {
+            if (response != null && !response.isEmpty()) {
+                JSONObject jsonData = new JSONObject(response);
+                JSONArray jsonReviews = jsonData.getJSONArray(RESULT);
+                for (int i = 0; i < jsonReviews.length(); i++) {
+                    JSONObject jsonReview = jsonReviews.getJSONObject(i);
+                    Review review = new Review();
+                    review.setId(jsonReview.getString(Review.ID));
+                    review.setAuthor(jsonReview.getString(Review.AUTHOR));
+                    review.setContent(jsonReview.getString(Review.CONTENT));
+                    reviewList.add(review);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return reviewList;
+    }
+
+    /**
+     * Given a JSON response, this method parses the data and returns the result
+     * as a list of Trailer objects
+     * @param response
+     * @return
+     */
+    public static List<Trailer> buildTrailerList(String response) {
+        List<Trailer> trailerList = new ArrayList<>();
+        try {
+            if (response != null && !response.isEmpty()) {
+                JSONObject jsonData = new JSONObject(response);
+                JSONArray jsonTrailers = jsonData.getJSONArray(RESULT);
+                for (int i = 0; i < jsonTrailers.length(); i++) {
+                    JSONObject jsonTrailer = jsonTrailers.getJSONObject(i);
+                    Trailer trailer = new Trailer();
+                    trailer.setId(jsonTrailer.getString(Trailer.ID));
+                    trailer.setKey(jsonTrailer.getString(Trailer.KEY));
+                    trailer.setName(jsonTrailer.getString(Trailer.NAME));
+                    trailer.setSite(jsonTrailer.getString(Trailer.SITE));
+                    trailer.setSize(jsonTrailer.getString(Trailer.SIZE));
+                    trailer.setType(jsonTrailer.getString(Trailer.TYPE));
+                    trailerList.add(trailer);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return trailerList;
     }
 
     /**
@@ -166,6 +238,45 @@ public class TMDBUtils {
         return url;
     }
 
+    /**
+     * Builds the URL to retrieve the videos associated to a given movie
+     * @param movieId
+     * @return
+     */
+    public static URL buildMovieTrailersUrl(String movieId) {
+        String path = TRAILERS_TEMPLATE_PATH.replace(ID_TEMPLATE, movieId);
+        Uri uri = Uri.parse(BASE_URL).buildUpon()
+                .appendEncodedPath(path)
+                .appendQueryParameter(TMDBUtils.PARAM_API_KEY, TMDBUtils.getApiKey())
+                .build();
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+    /**
+     * Builds the URL to retrieve the user reviews associated to a given movie
+     * @param movieId
+     * @return
+     */
+    public static URL buildMovieReviewUrl(String movieId) {
+        String path = REVIEWS_TEMPLATE_PATH.replace(ID_TEMPLATE, movieId);
+        Uri uri = Uri.parse(BASE_URL).buildUpon()
+                .appendEncodedPath(path)
+                .appendQueryParameter(TMDBUtils.PARAM_API_KEY, TMDBUtils.getApiKey())
+                .build();
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
 
     /**
      * This method returns the entire result from the HTTP response.

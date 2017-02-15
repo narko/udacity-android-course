@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.sixtytwentypeaks.movies.data.Movie;
+import com.sixtytwentypeaks.movies.model.Movie;
 import com.sixtytwentypeaks.movies.utils.TMDBUtils;
 
 import java.io.IOException;

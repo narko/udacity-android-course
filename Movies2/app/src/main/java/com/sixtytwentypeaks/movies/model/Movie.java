@@ -1,4 +1,4 @@
-package com.sixtytwentypeaks.movies.data;
+package com.sixtytwentypeaks.movies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,6 +14,16 @@ import java.net.URL;
  * https://github.com/mcharmas/android-parcelable-intellij-plugin
  */
 public class Movie implements Parcelable {
+    /****************************
+     * JSON strings
+     ****************************/
+    public final static String ID = "id";
+    public final static String TITLE = "original_title";
+    public final static String SYNOPSIS = "overview";
+    public final static String RATING = "vote_average";
+    public final static String DATE = "release_date";
+    public final static String POSTER_PATH = "poster_path";
+
     private String title;
     private URL posterURL;
     private String synopsis;

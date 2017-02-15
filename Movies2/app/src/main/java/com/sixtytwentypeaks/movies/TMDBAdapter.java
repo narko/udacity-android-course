@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.sixtytwentypeaks.movies.data.Movie;
+import com.sixtytwentypeaks.movies.model.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
