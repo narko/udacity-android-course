@@ -73,5 +73,10 @@
                 tool:text="Lorem ipsum color..." />
         </LinearLayout>
     </ScrollView>
-
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
 </LinearLayout>

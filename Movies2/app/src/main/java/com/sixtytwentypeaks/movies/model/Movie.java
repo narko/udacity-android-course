@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by narko on 25/01/17.
@@ -30,6 +31,8 @@ public class Movie implements Parcelable {
     private String rating;
     private String releaseDate;
     private String id;
+    private List<Review> reviews;
+    private List<Trailer> trailers;
 
     public String getTitle() {
         return title;
@@ -37,6 +40,22 @@ public class Movie implements Parcelable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public List<Trailer> getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(List<Trailer> trailers) {
+        this.trailers = trailers;
     }
 
     public URL getPosterURL() {
@@ -80,6 +99,9 @@ public class Movie implements Parcelable {
     }
 
 
+    public Movie() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -93,9 +115,8 @@ public class Movie implements Parcelable {
         dest.writeString(this.rating);
         dest.writeString(this.releaseDate);
         dest.writeString(this.id);
-    }
-
-    public Movie() {
+        dest.writeTypedList(this.reviews);
+        dest.writeTypedList(this.trailers);
     }
 
     protected Movie(Parcel in) {
@@ -105,9 +126,11 @@ public class Movie implements Parcelable {
         this.rating = in.readString();
         this.releaseDate = in.readString();
         this.id = in.readString();
+        this.reviews = in.createTypedArrayList(Review.CREATOR);
+        this.trailers = in.createTypedArrayList(Trailer.CREATOR);
     }
 
-    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel source) {
             return new Movie(source);
