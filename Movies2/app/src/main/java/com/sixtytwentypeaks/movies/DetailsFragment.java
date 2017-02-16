@@ -1,12 +1,17 @@
 package com.sixtytwentypeaks.movies;
 
 
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,10 +34,15 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Movie> {
+public class DetailsFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<Movie>,
+        TrailerAdapter.OnTrailerClickListener {
     private static final String TAG = DetailsFragment.class.getSimpleName();
     private static final int MOVIE_DETAILS_LOADER_ID = 0;
+    private Context mContext;
     private ProgressBar mLoadingIndicator;
+    private RecyclerView mTrailerRecyclerView;
+    private TrailerAdapter mTrailerAdapter;
 
     public DetailsFragment() {
         // Required empty public constructor
@@ -43,6 +53,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mContext = getContext();
         View layout = inflater.inflate(R.layout.fragment_details, container, false);
         Intent intent = getActivity().getIntent();
         if (intent != null) {
@@ -60,11 +71,16 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                 ImageView moviePosterImageView = (ImageView) layout.findViewById(R.id.iv_poster);
                 Picasso.with(getContext()).load(movie.getPosterURL().toString()).into(moviePosterImageView);
                 mLoadingIndicator = (ProgressBar) layout.findViewById(R.id.pb_loading_indicator);
+                mTrailerRecyclerView = (RecyclerView) layout.findViewById(R.id.rv_movie_trailers);
+                LinearLayoutManager trailerLinearLayoutManager = new LinearLayoutManager(mContext,
+                        LinearLayoutManager.VERTICAL, false);
+                mTrailerRecyclerView.setLayoutManager(trailerLinearLayoutManager);
+                mTrailerAdapter = new TrailerAdapter(this);
+                mTrailerRecyclerView.setAdapter(mTrailerAdapter);
                 // Initialize loader
                 getActivity().getSupportLoaderManager().initLoader(MOVIE_DETAILS_LOADER_ID, bundle, this);
             }
         }
-
 
         return layout;
     }
@@ -119,11 +135,31 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onLoadFinished(Loader<Movie> loader, Movie data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        // TODO show data in UI
+        mTrailerAdapter.setData(data.getTrailers());
     }
 
     @Override
     public void onLoaderReset(Loader<Movie> loader) {
         // Empty
+    }
+
+    @Override
+    public void onClick(Trailer trailer) {
+        Log.d(TAG, trailer.getYoutubeUrl().toString());
+//        ShareCompat.IntentBuilder.from(getActivity())
+//                .setChooserTitle("Select Video Player")
+//                .setType("video/*")
+//                .setText(trailer.getYoutubeUrl().toString())
+//                .startChooser();
+        Uri youtubeAppUri = Uri.parse(trailer.getKey());
+        Intent youtubeAppIntent = new Intent(Intent.ACTION_VIEW, youtubeAppUri);
+        try {
+            startActivity(youtubeAppIntent);
+        } catch (ActivityNotFoundException e) {
+            Log.d(TAG, "Youtube app not available. Starting browser...");
+            Intent youtubeBrowserIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(trailer.getYoutubeUrl().toString()));
+            startActivity(youtubeBrowserIntent);
+        }
     }
 }

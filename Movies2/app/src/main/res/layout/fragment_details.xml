@@ -71,6 +71,19 @@
                 android:padding="16dp"
                 android:textSize="16sp"
                 tool:text="Lorem ipsum color..." />
+            <TextView
+                android:id="@+id/tv_trailers_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/label_trailers"
+                tool:text="Trailers"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_movie_trailers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </ScrollView>
     <ProgressBar

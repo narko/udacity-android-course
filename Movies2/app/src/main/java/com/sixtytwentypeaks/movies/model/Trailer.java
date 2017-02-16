@@ -3,11 +3,16 @@ package com.sixtytwentypeaks.movies.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by narko on 14/02/17.
  */
 
 public class Trailer implements Parcelable {
+
+    private static final String YOUTUBE = "YouTube";
     /****************************
      * JSON strings
      ****************************/
@@ -24,6 +29,34 @@ public class Trailer implements Parcelable {
     private String site;
     private String size;
     private String type;
+
+
+    public URL getThumbnailUrl() {
+        URL url = null;
+        try {
+            if (YOUTUBE.equalsIgnoreCase(site.toLowerCase())) {
+                url = new URL("http://img.youtube.com/vi/" + key + "/0.jpg");
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    public URL getYoutubeUrl() {
+        URL url = null;
+        try {
+            if (YOUTUBE.equalsIgnoreCase(site.toLowerCase())) {
+                url = new URL("https://www.youtube.com/watch?v=" + key);
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
 
     public String getId() {
         return id;
