@@ -43,6 +43,8 @@ public class DetailsFragment extends Fragment implements
     private ProgressBar mLoadingIndicator;
     private RecyclerView mTrailerRecyclerView;
     private TrailerAdapter mTrailerAdapter;
+    private RecyclerView mReviewRecyclerView;
+    private ReviewAdapter mReviewAdapter;
 
     public DetailsFragment() {
         // Required empty public constructor
@@ -71,12 +73,25 @@ public class DetailsFragment extends Fragment implements
                 ImageView moviePosterImageView = (ImageView) layout.findViewById(R.id.iv_poster);
                 Picasso.with(getContext()).load(movie.getPosterURL().toString()).into(moviePosterImageView);
                 mLoadingIndicator = (ProgressBar) layout.findViewById(R.id.pb_loading_indicator);
+
+                // Set up trailers info
                 mTrailerRecyclerView = (RecyclerView) layout.findViewById(R.id.rv_movie_trailers);
                 LinearLayoutManager trailerLinearLayoutManager = new LinearLayoutManager(mContext,
                         LinearLayoutManager.VERTICAL, false);
                 mTrailerRecyclerView.setLayoutManager(trailerLinearLayoutManager);
+                mTrailerRecyclerView.setNestedScrollingEnabled(false);
                 mTrailerAdapter = new TrailerAdapter(this);
                 mTrailerRecyclerView.setAdapter(mTrailerAdapter);
+
+                // Set up reviews info
+                mReviewRecyclerView = (RecyclerView) layout.findViewById(R.id.rv_review_trailers);
+                LinearLayoutManager reviewLinearLayoutManager = new LinearLayoutManager(mContext,
+                        LinearLayoutManager.VERTICAL, false);
+                mReviewRecyclerView.setLayoutManager(reviewLinearLayoutManager);
+                mReviewRecyclerView.setNestedScrollingEnabled(false);
+                mReviewAdapter = new ReviewAdapter();
+                mReviewRecyclerView.setAdapter(mReviewAdapter);
+
                 // Initialize loader
                 getActivity().getSupportLoaderManager().initLoader(MOVIE_DETAILS_LOADER_ID, bundle, this);
             }
@@ -136,6 +151,7 @@ public class DetailsFragment extends Fragment implements
     public void onLoadFinished(Loader<Movie> loader, Movie data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mTrailerAdapter.setData(data.getTrailers());
+        mReviewAdapter.setData(data.getReviews());
     }
 
     @Override
@@ -146,12 +162,7 @@ public class DetailsFragment extends Fragment implements
     @Override
     public void onClick(Trailer trailer) {
         Log.d(TAG, trailer.getYoutubeUrl().toString());
-//        ShareCompat.IntentBuilder.from(getActivity())
-//                .setChooserTitle("Select Video Player")
-//                .setType("video/*")
-//                .setText(trailer.getYoutubeUrl().toString())
-//                .startChooser();
-        Uri youtubeAppUri = Uri.parse(trailer.getKey());
+        Uri youtubeAppUri = Uri.parse("vnd.youtube:" + trailer.getKey());
         Intent youtubeAppIntent = new Intent(Intent.ACTION_VIEW, youtubeAppUri);
         try {
             startActivity(youtubeAppIntent);
