@@ -1,8 +1,10 @@
 package com.sixtytwentypeaks.movies;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,8 +21,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements TMDBAdapter.OnMovieClickListener {
+public class MainActivity extends AppCompatActivity implements
+        TMDBAdapter.OnMovieClickListener,
+        LoaderManager.LoaderCallbacks<List<Movie>> {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String URL_KEY = "urlKey";
+    private static final int MOVIE_LOADER_ID = 1;
     private TMDBAdapter mTMDBAdapter;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
@@ -51,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements TMDBAdapter.OnMov
      * @param url TMDB url to fetch the movie list from
      */
     private void loadMovies(URL url) {
-        new TMDBAsyncTask().execute(url);
+        Bundle bundle = new Bundle();
+        bundle.putString(URL_KEY, url.toString());
+        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, bundle, this);
     }
 
     @Override
@@ -102,33 +110,57 @@ public class MainActivity extends AppCompatActivity implements TMDBAdapter.OnMov
         mErrorTextView.setVisibility(View.INVISIBLE);
     }
 
-    private class TMDBAsyncTask extends AsyncTask<URL, Void, String> {
+    @Override
+    public Loader<List<Movie>> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<List<Movie>>(this) {
+            List<Movie> mData = null;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String doInBackground(URL... params) {
-            String response = null;
-            try {
-                response = TMDBUtils.getResponseFromHttpUrl(params[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
+            @Override
+            protected void onStartLoading() {
+                if (mData != null && !mData.isEmpty()) {
+                    deliverResult(mData);
+                } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
             }
 
-            return response;
-        }
+            @Override
+            public List<Movie> loadInBackground() {
+                try {
+                    URL url;
+                    if (args != null) {
+                        String urlString = args.getString(URL_KEY);
+                        url = new URL(urlString);
+                    } else {
+                        return null;
+                    }
+                    String response = TMDBUtils.getResponseFromHttpUrl(url);
+                    return TMDBUtils.buildMovieList(response);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
 
-        @Override
-        protected void onPostExecute(String response) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            List<Movie> movieList = TMDBUtils.buildMovieList(response);
-            mTMDBAdapter.setMovieData(movieList);
-            //set RecyclerView scroller to initial position
-            mRecyclerView.scrollToPosition(0);
-        }
+            @Override
+            public void deliverResult(List<Movie> data) {
+                mData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mTMDBAdapter.setMovieData(data);
+        //set RecyclerView scroller to initial position
+        mRecyclerView.scrollToPosition(0);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Movie>> loader) {
+        // Empty
     }
 }
