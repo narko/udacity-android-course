@@ -8,6 +8,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements
     private void loadMovies(URL url) {
         Bundle bundle = new Bundle();
         bundle.putString(URL_KEY, url.toString());
-        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, bundle, this);
+        Log.d(TAG, url.toString());
+        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, bundle, this);
     }
 
     @Override
@@ -117,12 +119,8 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             protected void onStartLoading() {
-                if (mData != null && !mData.isEmpty()) {
-                    deliverResult(mData);
-                } else {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+                forceLoad();
             }
 
             @Override
