@@ -2,6 +2,7 @@ package com.sixtytwentypeaks.movies;
 
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,10 +17,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
+import com.sixtytwentypeaks.movies.data.MovieContract;
 import com.sixtytwentypeaks.movies.model.Movie;
 import com.sixtytwentypeaks.movies.model.Review;
 import com.sixtytwentypeaks.movies.model.Trailer;
@@ -61,7 +65,7 @@ public class DetailsFragment extends Fragment implements
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                Movie movie = bundle.getParcelable(Intent.EXTRA_INTENT);
+                final Movie movie = bundle.getParcelable(Intent.EXTRA_INTENT);
                 TextView movieTitleTextView = (TextView) layout.findViewById(R.id.tv_movie_title);
                 movieTitleTextView.setText(movie.getTitle());
                 TextView movieDateTextView = (TextView) layout.findViewById(R.id.tv_movie_date);
@@ -94,6 +98,36 @@ public class DetailsFragment extends Fragment implements
 
                 // Initialize loader
                 getActivity().getSupportLoaderManager().initLoader(MOVIE_DETAILS_LOADER_ID, bundle, this);
+
+                // Set up favourite toggle button
+                ToggleButton favouriteToggle = (ToggleButton) layout.findViewById(R.id.tb_favourite);
+                // TODO set up ToggleButton taking into account if the movie is already saved in favourites
+                favouriteToggle.setChecked(movie.getFavourite());
+                favouriteToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) { // Save movie
+                            ContentValues values = new ContentValues();
+                            values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
+                            values.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+                            values.put(MovieContract.MovieEntry.COLUMN_DATE, movie.getReleaseDate());
+                            values.put(MovieContract.MovieEntry.COLUMN_RATE, movie.getRating());
+                            values.put(MovieContract.MovieEntry.COLUMN_POSTER, movie.getPosterURL().toString());
+                            values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, movie.getSynopsis());
+                            Uri uri = getContext().getContentResolver()
+                                    .insert(MovieContract.MovieEntry.CONTENT_URI, values);
+                            if (uri != null) {
+                                Log.d(TAG, uri.toString());
+                            }
+                        } else { // Delete movie
+                            int id = movie.getId();
+                            Uri uri = MovieContract.MovieEntry.CONTENT_URI.buildUpon()
+                                    .appendEncodedPath(Integer.toString(id)).build();
+                            Log.d(TAG, "Deleting: " + uri.toString());
+                            getContext().getContentResolver().delete(uri, null, null);
+                        }
+                    }
+                });
             }
         }
 
@@ -121,11 +155,11 @@ public class DetailsFragment extends Fragment implements
                     mMovie = args.getParcelable(Intent.EXTRA_INTENT);
                 }
                 try {
-                    URL url = TMDBUtils.buildMovieTrailersUrl(mMovie.getId());
+                    URL url = TMDBUtils.buildMovieTrailersUrl(mMovie.getMovieId());
                     String response = TMDBUtils.getResponseFromHttpUrl(url);
                     Log.d(TAG, response);
                     List<Trailer> trailers = TMDBUtils.buildTrailerList(response);
-                    url = TMDBUtils.buildMovieReviewUrl(mMovie.getId());
+                    url = TMDBUtils.buildMovieReviewUrl(mMovie.getMovieId());
                     response = TMDBUtils.getResponseFromHttpUrl(url);
                     Log.d(TAG, response);
                     List<Review> reviews = TMDBUtils.buildReviewList(response);

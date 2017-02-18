@@ -140,7 +140,7 @@ public class TMDBUtils {
                 for (int i = 0; i < jsonMovies.length(); i++) {
                     JSONObject jsonMovie = jsonMovies.getJSONObject(i);
                     Movie movie = new Movie();
-                    movie.setId(jsonMovie.getString(Movie.ID));
+                    movie.setMovieId(jsonMovie.getString(Movie.MOVIE_ID));
                     movie.setTitle(jsonMovie.getString(Movie.TITLE));
                     movie.setSynopsis(jsonMovie.getString(Movie.SYNOPSIS));
                     movie.setReleaseDate(jsonMovie.getString(Movie.DATE));
@@ -335,16 +335,20 @@ public class TMDBUtils {
         List<Movie> movies = new ArrayList<>();
         while (cursor.moveToNext()) {
             Movie movie = new Movie();
-            movie.setId(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
+            movie.setId(cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry._ID)));
+            movie.setMovieId(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
             movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE)));
             movie.setReleaseDate(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_DATE)));
             movie.setRating(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATE)));
+            movie.setSynopsis(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SYNOPSIS)));
             try {
                 movie.setPosterURL(new URL(cursor.getString(cursor.getColumnIndex(
                         MovieContract.MovieEntry.COLUMN_POSTER))));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
+            // If the movie is in the Cursor then it has been saved as favourite once
+            movie.setFavourite(true);
             movies.add(movie);
         }
         return movies;

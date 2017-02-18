@@ -180,7 +180,10 @@ public class MainActivity extends AppCompatActivity implements
                         Log.d(TAG, "Querying ContentProvider for favourite movies...");
                         Cursor cursor = getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
                                 null, null, null, null, null);
-                        return TMDBUtils.transformToList(cursor);
+                        List<Movie> movies = TMDBUtils.transformToList(cursor);
+                        // we need to close the cursor because the system won't do it for us
+                        cursor.close();
+                        return movies;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

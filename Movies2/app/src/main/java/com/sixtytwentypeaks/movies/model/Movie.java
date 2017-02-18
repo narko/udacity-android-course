@@ -18,21 +18,31 @@ public class Movie implements Parcelable {
     /****************************
      * JSON strings
      ****************************/
-    public final static String ID = "id";
+    public final static String MOVIE_ID = "id";
     public final static String TITLE = "original_title";
     public final static String SYNOPSIS = "overview";
     public final static String RATING = "vote_average";
     public final static String DATE = "release_date";
     public final static String POSTER_PATH = "poster_path";
 
+    private int id;
     private String title;
     private URL posterURL;
     private String synopsis;
     private String rating;
     private String releaseDate;
-    private String id;
+    private String movieId;
+    private boolean favourite;
     private List<Review> reviews;
     private List<Trailer> trailers;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -66,12 +76,12 @@ public class Movie implements Parcelable {
         this.posterURL = posterURL;
     }
 
-    public String getId() {
-        return id;
+    public String getMovieId() {
+        return movieId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
     }
 
     public String getSynopsis() {
@@ -98,6 +108,13 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
+    public boolean getFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
+    }
 
     public Movie() {
     }
@@ -109,23 +126,27 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
         dest.writeString(this.title);
         dest.writeSerializable(this.posterURL);
         dest.writeString(this.synopsis);
         dest.writeString(this.rating);
         dest.writeString(this.releaseDate);
-        dest.writeString(this.id);
+        dest.writeString(this.movieId);
+        dest.writeValue(this.favourite);
         dest.writeTypedList(this.reviews);
         dest.writeTypedList(this.trailers);
     }
 
     protected Movie(Parcel in) {
+        this.id = in.readInt();
         this.title = in.readString();
         this.posterURL = (URL) in.readSerializable();
         this.synopsis = in.readString();
         this.rating = in.readString();
         this.releaseDate = in.readString();
-        this.id = in.readString();
+        this.movieId = in.readString();
+        this.favourite = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.reviews = in.createTypedArrayList(Review.CREATOR);
         this.trailers = in.createTypedArrayList(Trailer.CREATOR);
     }
