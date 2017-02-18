@@ -7,4 +7,7 @@
     <item android:id="@+id/action_top_rated_movies"
         android:title="@string/action_top_rated_movies"
         app:showAsAction="never"/>
+    <item android:id="@+id/action_favourite_movies"
+        android:title="@string/action_favourite_movies"
+        app:showAsAction="never"/>
 </menu>

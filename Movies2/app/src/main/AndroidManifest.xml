@@ -20,6 +20,11 @@
         <activity android:name="com.sixtytwentypeaks.movies.DetailsActivity"
             android:parentActivityName="com.sixtytwentypeaks.movies.MainActivity"
             android:label="@string/label_activity_details"/>
+
+        <provider
+            android:authorities="com.sixtytwentypeaks.movies"
+            android:name="com.sixtytwentypeaks.movies.data.MovieContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

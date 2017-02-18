@@ -1,8 +1,11 @@
 package com.sixtytwentypeaks.movies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
+import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.sixtytwentypeaks.movies.data.MovieContract;
 import com.sixtytwentypeaks.movies.model.Movie;
 import com.sixtytwentypeaks.movies.utils.TMDBUtils;
 
@@ -24,10 +28,17 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         TMDBAdapter.OnMovieClickListener,
-        LoaderManager.LoaderCallbacks<List<Movie>> {
+        LoaderCallbacks<List<Movie>> {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String URL_KEY = "urlKey";
     private static final int MOVIE_LOADER_ID = 1;
+
+    // Preferences Key/Values
+    private static final String SORTING_CRITERIA = "sorting_criteria";
+    private static final String SORTING_TOP_RATED = "top_rated";
+    private static final String SORTING_POPULAR = "popular";
+    private static final String SORTING_FAVOURITE = "favourite";
+
     private TMDBAdapter mTMDBAdapter;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
@@ -45,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setHasFixedSize(true);
         mTMDBAdapter = new TMDBAdapter(this);
         mRecyclerView.setAdapter(mTMDBAdapter);
+        initializePreferences();
         if (TMDBUtils.isDeviceOnline()) {
             hideErrorMessage();
             loadMovies(TMDBUtils.getPopularMoviesUrl());
@@ -54,14 +66,40 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Loads the movies from the given url into the UI
+     * This method used SharedPreference to store the sorting criteria of the movies.
+     * We use this method to initialize the key/value file.
+     */
+    private void initializePreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!sharedPreferences.contains(SORTING_CRITERIA)) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(SORTING_CRITERIA, SORTING_POPULAR);
+            editor.apply();
+        }
+    }
+
+    private void updateSharedPreferences(String sortingCriteria) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(SORTING_CRITERIA, sortingCriteria);
+        editor.apply();
+    }
+
+    /**
+     * Loads the movies from the given url or exiting ContentProvider into the UI
      * @param url TMDB url to fetch the movie list from
      */
     private void loadMovies(URL url) {
-        Bundle bundle = new Bundle();
-        bundle.putString(URL_KEY, url.toString());
-        Log.d(TAG, url.toString());
-        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, bundle, this);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String sorting = sharedPreferences.getString(SORTING_CRITERIA, SORTING_POPULAR);
+        if (sorting.equalsIgnoreCase(SORTING_POPULAR) || sorting.equalsIgnoreCase(SORTING_TOP_RATED)) {
+            Log.d(TAG, url.toString());
+            Bundle bundle = new Bundle();
+            bundle.putString(URL_KEY, url.toString());
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, bundle, this);
+        } else if (sorting.equalsIgnoreCase(SORTING_FAVOURITE)) {
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+        }
     }
 
     @Override
@@ -82,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
         switch (id) {
             case R.id.action_popular_movies:
+                updateSharedPreferences(SORTING_POPULAR);
                 if (TMDBUtils.isDeviceOnline()) {
                     hideErrorMessage();
                     loadMovies(TMDBUtils.getPopularMoviesUrl());
@@ -90,12 +129,17 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
             case R.id.action_top_rated_movies:
+                updateSharedPreferences(SORTING_TOP_RATED);
                 if (TMDBUtils.isDeviceOnline()) {
                     hideErrorMessage();
                     loadMovies(TMDBUtils.getTopRatedMoviesUrl());
                 } else {
                     displayErrorMessage();
                 }
+                break;
+            case R.id.action_favourite_movies:
+                updateSharedPreferences(SORTING_FAVOURITE);
+                loadMovies(null);
                 break;
         }
 
@@ -127,14 +171,17 @@ public class MainActivity extends AppCompatActivity implements
             public List<Movie> loadInBackground() {
                 try {
                     URL url;
-                    if (args != null) {
+                    if (args != null) { // We load TOP_RATED or POPULAR movies
                         String urlString = args.getString(URL_KEY);
                         url = new URL(urlString);
-                    } else {
-                        return null;
+                        String response = TMDBUtils.getResponseFromHttpUrl(url);
+                        return TMDBUtils.buildMovieList(response);
+                    } else { // We load FAVOURITE movies
+                        Log.d(TAG, "Querying ContentProvider for favourite movies...");
+                        Cursor cursor = getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                                null, null, null, null, null);
+                        return TMDBUtils.transformToList(cursor);
                     }
-                    String response = TMDBUtils.getResponseFromHttpUrl(url);
-                    return TMDBUtils.buildMovieList(response);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -152,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
+        // TODO show custom screen if there is no movie data available. We need this mostly for the favourite sorting
         mTMDBAdapter.setMovieData(data);
         //set RecyclerView scroller to initial position
         mRecyclerView.scrollToPosition(0);

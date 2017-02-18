@@ -2,6 +2,7 @@
     <string name="app_name">Movies Stage 2</string>
     <string name="action_popular_movies">Popular Movies</string>
     <string name="action_top_rated_movies">Top Rated Movies</string>
+    <string name="action_favourite_movies">Favourite Movies</string>
     <string name="error_offline">Upps! You don\'t have Internet connection at the moment.</string>
     <string name="label_activity_details">Movie Detail</string>
     <string name="label_trailers">Trailers:</string>

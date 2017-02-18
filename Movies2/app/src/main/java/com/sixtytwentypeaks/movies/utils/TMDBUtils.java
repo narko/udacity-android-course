@@ -1,8 +1,10 @@
 package com.sixtytwentypeaks.movies.utils;
 
+import android.database.Cursor;
 import android.net.Uri;
 
 import com.sixtytwentypeaks.movies.BuildConfig;
+import com.sixtytwentypeaks.movies.data.MovieContract;
 import com.sixtytwentypeaks.movies.model.Movie;
 import com.sixtytwentypeaks.movies.model.Review;
 import com.sixtytwentypeaks.movies.model.Trailer;
@@ -321,6 +323,31 @@ public class TMDBUtils {
         }
 
         return false;
+    }
+
+    /**
+     * Transform a cursor containing Movie data to a List<Movie>.
+     * This is a convenient method to reuse the existing TMDBAdapter.
+     * @param cursor
+     * @return List<Movie>
+     */
+    public static List<Movie> transformToList(Cursor cursor) {
+        List<Movie> movies = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Movie movie = new Movie();
+            movie.setId(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID)));
+            movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE)));
+            movie.setReleaseDate(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_DATE)));
+            movie.setRating(cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATE)));
+            try {
+                movie.setPosterURL(new URL(cursor.getString(cursor.getColumnIndex(
+                        MovieContract.MovieEntry.COLUMN_POSTER))));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            movies.add(movie);
+        }
+        return movies;
     }
 
     //****************************
