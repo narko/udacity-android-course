@@ -116,6 +116,9 @@ public class DetailsFragment extends Fragment implements
                             values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, movie.getSynopsis());
                             Uri uri = getContext().getContentResolver()
                                     .insert(MovieContract.MovieEntry.CONTENT_URI, values);
+                            // Update current movie instance with the db id. We need this in case the
+                            // user decides to click on the button again, which will trigger a db delete
+                            movie.setId(Integer.parseInt(uri.getPathSegments().get(1)));
                             if (uri != null) {
                                 Log.d(TAG, uri.toString());
                             }
