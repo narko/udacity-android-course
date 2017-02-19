@@ -7,4 +7,5 @@
     <string name="label_activity_details">Movie Detail</string>
     <string name="label_trailers">Trailers:</string>
     <string name="label_reviews">Reviews:</string>
+    <string name="empty_favourites">Currently your list of favourite movies is empty. Go and add some!</string>
 </resources>

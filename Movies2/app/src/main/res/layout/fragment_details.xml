@@ -67,9 +67,8 @@
                     android:id="@+id/tb_favourite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:text="Favourite"
-                    tool:text="Favourite" />
+                    style="?android:attr/starStyle"
+                    android:layout_gravity="right" />
             </LinearLayout>
 
             <TextView

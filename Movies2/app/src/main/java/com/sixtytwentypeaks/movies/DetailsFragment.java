@@ -5,8 +5,10 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -43,17 +45,25 @@ public class DetailsFragment extends Fragment implements
         TrailerAdapter.OnTrailerClickListener {
     private static final String TAG = DetailsFragment.class.getSimpleName();
     private static final int MOVIE_DETAILS_LOADER_ID = 0;
+    private static final String TOGGLE_FAVOURITE_KEY = "toggleFavourite";
     private Context mContext;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mTrailerRecyclerView;
     private TrailerAdapter mTrailerAdapter;
     private RecyclerView mReviewRecyclerView;
     private ReviewAdapter mReviewAdapter;
+    private Movie mMovie;
 
     public DetailsFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // https://developer.android.com/reference/android/app/Fragment.html#setRetainInstance(boolean)
+        setRetainInstance(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,19 +73,20 @@ public class DetailsFragment extends Fragment implements
         View layout = inflater.inflate(R.layout.fragment_details, container, false);
         Intent intent = getActivity().getIntent();
         if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                final Movie movie = bundle.getParcelable(Intent.EXTRA_INTENT);
+            Bundle intentBundle = intent.getExtras();
+            if (intentBundle != null) {
+                mMovie = intentBundle.getParcelable(Intent.EXTRA_INTENT);
+                loadFavouriteMovieIfExists(mMovie.getMovieId());
                 TextView movieTitleTextView = (TextView) layout.findViewById(R.id.tv_movie_title);
-                movieTitleTextView.setText(movie.getTitle());
+                movieTitleTextView.setText(mMovie.getTitle());
                 TextView movieDateTextView = (TextView) layout.findViewById(R.id.tv_movie_date);
-                movieDateTextView.setText(movie.getReleaseDate());
+                movieDateTextView.setText(mMovie.getReleaseDate());
                 TextView movieRateTextView = (TextView) layout.findViewById(R.id.tv_movie_rate);
-                movieRateTextView.setText(movie.getRating());
+                movieRateTextView.setText(mMovie.getRating());
                 TextView movieSynopsisTextView = (TextView) layout.findViewById(R.id.tv_movie_synopsis);
-                movieSynopsisTextView.setText(movie.getSynopsis());
+                movieSynopsisTextView.setText(mMovie.getSynopsis());
                 ImageView moviePosterImageView = (ImageView) layout.findViewById(R.id.iv_poster);
-                Picasso.with(getContext()).load(movie.getPosterURL().toString()).into(moviePosterImageView);
+                Picasso.with(getContext()).load(mMovie.getPosterURL().toString()).into(moviePosterImageView);
                 mLoadingIndicator = (ProgressBar) layout.findViewById(R.id.pb_loading_indicator);
 
                 // Set up trailers info
@@ -96,56 +107,72 @@ public class DetailsFragment extends Fragment implements
                 mReviewAdapter = new ReviewAdapter();
                 mReviewRecyclerView.setAdapter(mReviewAdapter);
 
-                // Initialize loader
-                getActivity().getSupportLoaderManager().initLoader(MOVIE_DETAILS_LOADER_ID, bundle, this);
-
                 // Set up favourite toggle button
                 ToggleButton favouriteToggle = (ToggleButton) layout.findViewById(R.id.tb_favourite);
-                // TODO set up ToggleButton taking into account if the movie is already saved in favourites
-                favouriteToggle.setChecked(movie.getFavourite());
+                // set up ToggleButton taking into account if the movie is already saved in favourites
+                if (savedInstanceState != null && savedInstanceState.containsKey(TOGGLE_FAVOURITE_KEY)) {
+                    mMovie.setFavourite(savedInstanceState.getBoolean(TOGGLE_FAVOURITE_KEY));
+                }
+                favouriteToggle.setChecked(mMovie.getFavourite());
                 favouriteToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) { // Save movie
                             ContentValues values = new ContentValues();
-                            values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getMovieId());
-                            values.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
-                            values.put(MovieContract.MovieEntry.COLUMN_DATE, movie.getReleaseDate());
-                            values.put(MovieContract.MovieEntry.COLUMN_RATE, movie.getRating());
-                            values.put(MovieContract.MovieEntry.COLUMN_POSTER, movie.getPosterURL().toString());
-                            values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, movie.getSynopsis());
+                            values.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, mMovie.getMovieId());
+                            values.put(MovieContract.MovieEntry.COLUMN_TITLE, mMovie.getTitle());
+                            values.put(MovieContract.MovieEntry.COLUMN_DATE, mMovie.getReleaseDate());
+                            values.put(MovieContract.MovieEntry.COLUMN_RATE, mMovie.getRating());
+                            values.put(MovieContract.MovieEntry.COLUMN_POSTER, mMovie.getPosterURL().toString());
+                            values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, mMovie.getSynopsis());
                             Uri uri = getContext().getContentResolver()
                                     .insert(MovieContract.MovieEntry.CONTENT_URI, values);
                             // Update current movie instance with the db id. We need this in case the
                             // user decides to click on the button again, which will trigger a db delete
-                            movie.setId(Integer.parseInt(uri.getPathSegments().get(1)));
+                            mMovie.setId(Integer.parseInt(uri.getPathSegments().get(1)));
+                            mMovie.setFavourite(true);
                             if (uri != null) {
                                 Log.d(TAG, uri.toString());
                             }
                         } else { // Delete movie
-                            int id = movie.getId();
+                            int id = mMovie.getId();
                             Uri uri = MovieContract.MovieEntry.CONTENT_URI.buildUpon()
                                     .appendEncodedPath(Integer.toString(id)).build();
                             Log.d(TAG, "Deleting: " + uri.toString());
                             getContext().getContentResolver().delete(uri, null, null);
+                            mMovie.setFavourite(false);
                         }
                     }
                 });
+
+                // Initialize loader
+                getActivity().getSupportLoaderManager().initLoader(MOVIE_DETAILS_LOADER_ID, intentBundle, this);
             }
         }
 
         return layout;
     }
 
+    private void loadFavouriteMovieIfExists(String movieId) {
+        String selection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        String[] selectionArgs = new String[] {movieId};
+        Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                null, selection, selectionArgs, null);
+        List<Movie> movies = TMDBUtils.transformToList(cursor);
+        if (movies != null && !movies.isEmpty()) {
+            mMovie = movies.get(0); // Only one movie with the given id can exists
+        }
+    }
+
     @Override
     public Loader<Movie> onCreateLoader(int id, final Bundle args) {
         return new AsyncTaskLoader<Movie>(getContext()) {
-            Movie mMovie = null;
+            Movie movie = null;
 
             @Override
             protected void onStartLoading() {
-                if (mMovie != null && mMovie.getReviews() != null && mMovie.getTrailers() != null) {
-                    deliverResult(mMovie);
+                if (movie != null && movie.getReviews() != null && movie.getTrailers() != null) {
+                    deliverResult(movie);
                 } else {
                     mLoadingIndicator.setVisibility(View.VISIBLE);
                     forceLoad();
@@ -155,21 +182,21 @@ public class DetailsFragment extends Fragment implements
             @Override
             public Movie loadInBackground() {
                 if (args != null) {
-                    mMovie = args.getParcelable(Intent.EXTRA_INTENT);
+                    movie = args.getParcelable(Intent.EXTRA_INTENT);
                 }
                 try {
-                    URL url = TMDBUtils.buildMovieTrailersUrl(mMovie.getMovieId());
+                    URL url = TMDBUtils.buildMovieTrailersUrl(movie.getMovieId());
                     String response = TMDBUtils.getResponseFromHttpUrl(url);
                     Log.d(TAG, response);
                     List<Trailer> trailers = TMDBUtils.buildTrailerList(response);
-                    url = TMDBUtils.buildMovieReviewUrl(mMovie.getMovieId());
+                    url = TMDBUtils.buildMovieReviewUrl(movie.getMovieId());
                     response = TMDBUtils.getResponseFromHttpUrl(url);
                     Log.d(TAG, response);
                     List<Review> reviews = TMDBUtils.buildReviewList(response);
-                    mMovie.setTrailers(trailers);
-                    mMovie.setReviews(reviews);
+                    movie.setTrailers(trailers);
+                    movie.setReviews(reviews);
 
-                    return mMovie;
+                    return movie;
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -178,7 +205,7 @@ public class DetailsFragment extends Fragment implements
 
             @Override
             public void deliverResult(Movie data) {
-                mMovie = data;
+                movie = data;
                 super.deliverResult(data);
             }
         };
@@ -210,4 +237,12 @@ public class DetailsFragment extends Fragment implements
             startActivity(youtubeBrowserIntent);
         }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(TOGGLE_FAVOURITE_KEY, mMovie.getFavourite());
+        super.onSaveInstanceState(outState);
+    }
+
+
 }

@@ -17,6 +17,14 @@
         android:textSize="20sp"
         android:padding="16dp"
         android:visibility="invisible"/>
+    <TextView
+        android:id="@+id/tv_empty_favourites"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/empty_favourites"
+        android:textSize="20sp"
+        android:padding="16dp"
+        android:visibility="invisible"/>
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
         android:layout_width="30dp"

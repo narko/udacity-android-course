@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
     private TextView mErrorTextView;
+    private TextView mNoFavouritesTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_posters);
         mErrorTextView = (TextView) findViewById(R.id.tv_error);
+        mNoFavouritesTextView = (TextView) findViewById(R.id.tv_empty_favourites);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -57,11 +59,16 @@ public class MainActivity extends AppCompatActivity implements
         mTMDBAdapter = new TMDBAdapter(this);
         mRecyclerView.setAdapter(mTMDBAdapter);
         initializePreferences();
-        if (TMDBUtils.isDeviceOnline()) {
-            hideErrorMessage();
-            loadMovies(TMDBUtils.getPopularMoviesUrl());
-        } else {
-            displayErrorMessage();
+        String currentSorting = getCurrentSortingCriteria();
+        if (currentSorting.equalsIgnoreCase(SORTING_POPULAR) || currentSorting.equalsIgnoreCase((SORTING_TOP_RATED))) {
+            if (TMDBUtils.isDeviceOnline()) {
+                hideConnectivityErrorMessage();
+                loadMovies(TMDBUtils.getPopularMoviesUrl());
+            } else {
+                displayConnectivityErrorMessage();
+            }
+        } else if (currentSorting.equalsIgnoreCase(SORTING_FAVOURITE)) {
+            loadMovies(null);
         }
     }
 
@@ -85,13 +92,17 @@ public class MainActivity extends AppCompatActivity implements
         editor.apply();
     }
 
+    private String getCurrentSortingCriteria() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getString(SORTING_CRITERIA, SORTING_POPULAR);
+    }
+
     /**
      * Loads the movies from the given url or exiting ContentProvider into the UI
      * @param url TMDB url to fetch the movie list from
      */
     private void loadMovies(URL url) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String sorting = sharedPreferences.getString(SORTING_CRITERIA, SORTING_POPULAR);
+        String sorting = getCurrentSortingCriteria();
         if (sorting.equalsIgnoreCase(SORTING_POPULAR) || sorting.equalsIgnoreCase(SORTING_TOP_RATED)) {
             Log.d(TAG, url.toString());
             Bundle bundle = new Bundle();
@@ -122,23 +133,24 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.action_popular_movies:
                 updateSharedPreferences(SORTING_POPULAR);
                 if (TMDBUtils.isDeviceOnline()) {
-                    hideErrorMessage();
+                    hideConnectivityErrorMessage();
                     loadMovies(TMDBUtils.getPopularMoviesUrl());
                 } else {
-                    displayErrorMessage();
+                    displayConnectivityErrorMessage();
                 }
                 break;
             case R.id.action_top_rated_movies:
                 updateSharedPreferences(SORTING_TOP_RATED);
                 if (TMDBUtils.isDeviceOnline()) {
-                    hideErrorMessage();
+                    hideConnectivityErrorMessage();
                     loadMovies(TMDBUtils.getTopRatedMoviesUrl());
                 } else {
-                    displayErrorMessage();
+                    displayConnectivityErrorMessage();
                 }
                 break;
             case R.id.action_favourite_movies:
                 updateSharedPreferences(SORTING_FAVOURITE);
+                hideConnectivityErrorMessage();
                 loadMovies(null);
                 break;
         }
@@ -146,12 +158,22 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void displayErrorMessage() {
+    private void displayEmptyFavouritesMessage() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mNoFavouritesTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmptyFavouritesMessage() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mNoFavouritesTextView.setVisibility(View.INVISIBLE);
+    }
+
+    private void displayConnectivityErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorTextView.setVisibility(View.VISIBLE);
     }
 
-    private void hideErrorMessage() {
+    private void hideConnectivityErrorMessage() {
         mRecyclerView.setVisibility(View.VISIBLE);
         mErrorTextView.setVisibility(View.INVISIBLE);
     }
@@ -202,10 +224,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        // TODO show custom screen if there is no movie data available. We need this mostly for the favourite sorting
         mTMDBAdapter.setMovieData(data);
         //set RecyclerView scroller to initial position
         mRecyclerView.scrollToPosition(0);
+        // show custom screen if there is no movie data available. We need this mostly for the favourite sorting
+        if (data.isEmpty()) {
+            displayEmptyFavouritesMessage();
+        } else {
+            hideEmptyFavouritesMessage();
+        }
     }
 
     @Override
