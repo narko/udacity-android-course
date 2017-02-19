@@ -53,6 +53,8 @@ public class DetailsFragment extends Fragment implements
     private RecyclerView mReviewRecyclerView;
     private ReviewAdapter mReviewAdapter;
     private Movie mMovie;
+    private TextView mTrailersTextView;
+    private TextView mReviewsTextView;
 
     public DetailsFragment() {
         // Required empty public constructor
@@ -77,6 +79,8 @@ public class DetailsFragment extends Fragment implements
             if (intentBundle != null) {
                 mMovie = intentBundle.getParcelable(Intent.EXTRA_INTENT);
                 loadFavouriteMovieIfExists(mMovie.getMovieId());
+                mTrailersTextView = (TextView) layout.findViewById(R.id.tv_trailers_label);
+                mReviewsTextView = (TextView) layout.findViewById(R.id.tv_reviews_label);
                 TextView movieTitleTextView = (TextView) layout.findViewById(R.id.tv_movie_title);
                 movieTitleTextView.setText(mMovie.getTitle());
                 TextView movieDateTextView = (TextView) layout.findViewById(R.id.tv_movie_date);
@@ -214,8 +218,21 @@ public class DetailsFragment extends Fragment implements
     @Override
     public void onLoadFinished(Loader<Movie> loader, Movie data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mTrailerAdapter.setData(data.getTrailers());
+        List<Trailer> trailers = data.getTrailers();
+        mTrailerAdapter.setData(trailers);
+        if (trailers != null && !trailers.isEmpty()) {
+            mTrailersTextView.setVisibility(View.VISIBLE);
+        } else {
+            mTrailersTextView.setVisibility(View.INVISIBLE);
+        }
+
+        List<Review> reviews = data.getReviews();
         mReviewAdapter.setData(data.getReviews());
+        if (reviews != null && !reviews.isEmpty()) {
+            mReviewsTextView.setVisibility(View.VISIBLE);
+        } else {
+            mReviewsTextView.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
