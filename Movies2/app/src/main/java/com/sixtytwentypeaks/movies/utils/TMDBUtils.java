@@ -1,6 +1,9 @@
 package com.sixtytwentypeaks.movies.utils;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 
 import com.sixtytwentypeaks.movies.BuildConfig;
@@ -310,19 +313,28 @@ public class TMDBUtils {
      * http://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out
      * @return true if the device has online access.
      */
-    public static boolean isDeviceOnline() {
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int     exitValue = ipProcess.waitFor();
-            return (exitValue == 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public static boolean isDeviceOnline(Context context) {
+        // This code seems to be stealing the thread and causing the main UI thread to block
+//        Runtime runtime = Runtime.getRuntime();
+//        try {
+//            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+//            int     exitValue = ipProcess.waitFor();
+//            return (exitValue == 0);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return false;
 
-        return false;
+        // We use the recommended code pointed out by google in the docs:
+        // https://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html#DetermineType
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     /**

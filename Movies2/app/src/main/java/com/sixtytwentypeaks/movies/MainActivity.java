@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements
         initializePreferences();
         String currentSorting = getCurrentSortingCriteria();
         if (currentSorting.equalsIgnoreCase(SORTING_POPULAR) || currentSorting.equalsIgnoreCase((SORTING_TOP_RATED))) {
-            if (TMDBUtils.isDeviceOnline()) {
+            if (TMDBUtils.isDeviceOnline(this)) {
                 hideConnectivityErrorMessage();
                 loadMovies(TMDBUtils.getPopularMoviesUrl());
             } else {
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (id) {
             case R.id.action_popular_movies:
                 updateSharedPreferences(SORTING_POPULAR);
-                if (TMDBUtils.isDeviceOnline()) {
+                if (TMDBUtils.isDeviceOnline(this)) {
                     hideConnectivityErrorMessage();
                     loadMovies(TMDBUtils.getPopularMoviesUrl());
                 } else {
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.action_top_rated_movies:
                 updateSharedPreferences(SORTING_TOP_RATED);
-                if (TMDBUtils.isDeviceOnline()) {
+                if (TMDBUtils.isDeviceOnline(this)) {
                     hideConnectivityErrorMessage();
                     loadMovies(TMDBUtils.getTopRatedMoviesUrl());
                 } else {
