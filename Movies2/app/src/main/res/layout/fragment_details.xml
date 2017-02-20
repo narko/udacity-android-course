@@ -61,14 +61,17 @@
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
                         tool:text="8.0/10" />
+                    <ToggleButton
+                        android:id="@+id/tb_favourite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/starStyle"
+                        android:textOff="@string/tb_add_favourite"
+                        android:textOn="@string/tb_remove_favourite"
+                        android:textColor="@android:color/darker_gray"
+                        android:layout_gravity="right"
+                        android:checked="false" />
                 </LinearLayout>
-
-                <ToggleButton
-                    android:id="@+id/tb_favourite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="?android:attr/starStyle"
-                    android:layout_gravity="right" />
             </LinearLayout>
 
             <TextView

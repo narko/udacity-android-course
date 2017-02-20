@@ -8,4 +8,6 @@
     <string name="label_trailers">Trailers:</string>
     <string name="label_reviews">Reviews:</string>
     <string name="empty_favourites">Currently your list of favourite movies is empty. Go and add some!</string>
+    <string name="tb_remove_favourite">Remove from favourites</string>
+    <string name="tb_add_favourite">Add to favourites</string>
 </resources>
