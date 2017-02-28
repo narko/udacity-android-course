@@ -33,7 +33,8 @@
         app:borderWidth="0dp"
         app:elevation="6dp"
         app:fabSize="normal"
-        app:pressedTranslationZ="12dp" />
+        app:pressedTranslationZ="12dp"
+        android:contentDescription="@string/a11_add_stock_button"/>
 
     <TextView
         android:id="@+id/error"

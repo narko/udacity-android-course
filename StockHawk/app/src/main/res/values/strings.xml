@@ -33,4 +33,6 @@
     <string name="toast_no_connectivity">Will refresh when network available.</string>
     <string name="toast_no_symbol_found">Symbol %s does not exist.</string>
 
+    <string name="a11_add_stock_button">Add new Stock</string>
+
 </resources>
