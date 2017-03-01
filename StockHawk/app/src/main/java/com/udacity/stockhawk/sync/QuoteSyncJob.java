@@ -17,6 +17,7 @@ import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -65,6 +66,7 @@ public final class QuoteSyncJob {
                 return;
             }
 
+            //if at some point we have bad connectivity here this line is throwing a java.net.UnknownHostException
             Map<String, Stock> quotes = YahooFinance.get(stockArray);
             Iterator<String> iterator = stockCopy.iterator();
 
@@ -129,6 +131,8 @@ public final class QuoteSyncJob {
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
             context.sendBroadcast(dataUpdatedIntent);
 
+        } catch (UnknownHostException e) {
+            Timber.e(e, "Error calling finance.yahoo.com. Bad connectivity maybe?");
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
         }

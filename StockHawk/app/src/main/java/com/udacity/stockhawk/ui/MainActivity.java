@@ -145,6 +145,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if (data.getCount() != 0) {
             error.setVisibility(View.GONE);
+            stockRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            if (!networkUp()) {
+                error.setText(getString(R.string.error_no_network));
+                error.setVisibility(View.VISIBLE);
+                stockRecyclerView.setVisibility(View.INVISIBLE);
+            }
         }
         adapter.setCursor(data);
     }
