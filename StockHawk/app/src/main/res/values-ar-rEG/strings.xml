@@ -14,5 +14,9 @@
     <string name="toast_no_symbol_found">Symbol %s does not exist.</string>
 
     <string name="a11_add_stock_button">Add new Stock</string>
-
+    <string name="label_close">Close</string>
+    <string name="stock_details_label">Stock details</string>
+    <string name="label_price">Price:</string>
+    <string name="label_percentage_change">Percentage change:</string>
+    <string name="label_absolute_change">Absolute change:</string>
 </resources>
