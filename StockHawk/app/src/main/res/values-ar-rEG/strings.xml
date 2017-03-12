@@ -19,4 +19,5 @@
     <string name="label_price">Price:</string>
     <string name="label_percentage_change">Percentage change:</string>
     <string name="label_absolute_change">Absolute change:</string>
+    <string name="empty_stock_list">No stocks added!</string>
 </resources>
