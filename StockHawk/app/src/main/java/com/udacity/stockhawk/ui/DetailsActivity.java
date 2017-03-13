@@ -12,16 +12,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -82,6 +87,12 @@ public class DetailsActivity extends AppCompatActivity
         }
     }
 
+    private String formatDate(String millis) {
+        Date date = new Date(Long.parseLong(millis));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(date);
+    }
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.getCount() != 0) {
@@ -91,10 +102,12 @@ public class DetailsActivity extends AppCompatActivity
             String[] historyRows = history.split("\n");
             String[] cols = null;
             List<Entry> entries = new ArrayList<Entry>();
+            final List<String> valuesX = new ArrayList<String>();
             float x = 0f;
             for (int i = historyRows.length - 1; i >= 0; i--) {
                 cols = historyRows[i].split(",");
-                Timber.i(cols[1]);
+                Timber.i(formatDate(cols[0]) + ", " + cols[1]);
+                valuesX.add(formatDate(cols[0]));
                 entries.add(new Entry(x, Float.parseFloat(cols[1])));
                 x++;
             }
@@ -102,6 +115,14 @@ public class DetailsActivity extends AppCompatActivity
             dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
             LineData lineData = new LineData(dataSet);
             mChart.setData(lineData);
+            XAxis xAxis = mChart.getXAxis();
+            xAxis.setValueFormatter(new IAxisValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, AxisBase axis) {
+                    return valuesX.get((int) value);
+                }
+            });
+
             mChart.invalidate();
 
 
