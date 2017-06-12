@@ -1,5 +1,7 @@
 package com.udacity.gradle.builditbigger;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.widget.Button;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.udacity.gradle.jokesdisplay.JokeActivity;
 
 
 /**
@@ -45,6 +48,17 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void displayJoke() {
-        new EndpointsAsyncTask().execute(getContext());
+        final Context context = getContext();
+        EndpointsAsyncTask task = new EndpointsAsyncTask();
+        task.setListener(new EndpointsAsyncTask.AsyncTaskListener() {
+            @Override
+            public void onComplete(String result) {
+                Intent intent = new Intent(context, JokeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(JokeActivity.JOKE_KEY, result);
+                context.startActivity(intent);
+            }
+        });
+        task.execute(context);
     }
 }
