@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.udacity.gradle.jokesdisplay.JokeActivity;
 
@@ -17,6 +18,7 @@ import com.udacity.gradle.jokesdisplay.JokeActivity;
  */
 public class MainActivityFragment extends Fragment {
     private final static String TAG = MainActivityFragment.class.getSimpleName();
+    private ProgressBar progressBar;
 
     public MainActivityFragment() {
     }
@@ -25,6 +27,8 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
+
+        progressBar = (ProgressBar) root.findViewById(R.id.progressBar);
 
         Button button = (Button) root.findViewById(R.id.jokeButton);
         button.setOnClickListener(new View.OnClickListener() {
@@ -40,9 +44,11 @@ public class MainActivityFragment extends Fragment {
     private void displayJoke() {
         final Context context = getContext();
         EndpointsAsyncTask task = new EndpointsAsyncTask();
+        progressBar.setVisibility(View.VISIBLE);
         task.setListener(new EndpointsAsyncTask.AsyncTaskListener() {
             @Override
             public void onComplete(String result) {
+                progressBar.setVisibility(View.GONE);
                 Intent intent = new Intent(context, JokeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(JokeActivity.JOKE_KEY, result);
