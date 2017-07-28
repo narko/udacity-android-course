@@ -17,7 +17,7 @@ import com.udacity.gradle.jokesdisplay.JokeActivity;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragmentBase extends Fragment {
-    private final static String TAG = MainActivityFragmentBase.class.getSimpleName();
+    protected final static String TAG = MainActivityFragmentBase.class.getSimpleName();
     private ProgressBar progressBar;
 
     public MainActivityFragmentBase() {
@@ -46,7 +46,7 @@ public class MainActivityFragmentBase extends Fragment {
         // Empty
     }
 
-    private void displayJoke() {
+    protected void displayJoke() {
         final Context context = getContext();
         EndpointsAsyncTask task = new EndpointsAsyncTask();
         progressBar.setVisibility(View.VISIBLE);
