@@ -16,11 +16,11 @@ import com.udacity.gradle.jokesdisplay.JokeActivity;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
-    private final static String TAG = MainActivityFragment.class.getSimpleName();
+public class MainActivityFragmentBase extends Fragment {
+    private final static String TAG = MainActivityFragmentBase.class.getSimpleName();
     private ProgressBar progressBar;
 
-    public MainActivityFragment() {
+    public MainActivityFragmentBase() {
     }
 
     @Override
@@ -37,8 +37,13 @@ public class MainActivityFragment extends Fragment {
                 displayJoke();
             }
         });
+        customizeLayout(root);
 
         return root;
+    }
+
+    protected void customizeLayout(View root) {
+        // Empty
     }
 
     private void displayJoke() {
