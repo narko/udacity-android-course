@@ -59,7 +59,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         public void bind(final Recipe item, final OnItemClickListener listener) {
             titleTv.setText(item.getName());
             Picasso.with(itemView.getContext())
-                    .load(item.getThumbnail())
+                    .load(item.getImage())
                     .placeholder(R.drawable.default_placeholder)
                     .error(R.drawable.default_placeholder)
                     .into(thumbnail);
