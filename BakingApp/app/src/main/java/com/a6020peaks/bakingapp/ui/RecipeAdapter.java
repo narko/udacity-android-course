@@ -53,7 +53,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         public RecipeViewHolder(View itemView) {
             super(itemView);
             titleTv = itemView.findViewById(R.id.title);
-            thumbnail = itemView.findViewById(R.id.thumbnail);
+            thumbnail = itemView.findViewById(R.id.image);
         }
 
         public void bind(final Recipe item, final OnItemClickListener listener) {
