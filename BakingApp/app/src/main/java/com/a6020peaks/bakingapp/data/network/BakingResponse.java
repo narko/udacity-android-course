@@ -6,6 +6,8 @@ import com.a6020peaks.bakingapp.data.database.RecipeEntry;
 import com.a6020peaks.bakingapp.data.database.RecipeWithIngredients;
 import com.a6020peaks.bakingapp.data.database.RecipeWithSteps;
 
+import java.util.List;
+
 /**
  * Created by narko on 19/09/17.
  */
@@ -13,32 +15,32 @@ import com.a6020peaks.bakingapp.data.database.RecipeWithSteps;
 /**
  * Utility class to keep the data parsed from the JSON response
  */
-public class RecipeResponse {
+public class BakingResponse {
     @NonNull
-    private final RecipeEntry[] mRecipes;
+    private final List<RecipeEntry> mRecipes;
 
     @NonNull
-    private final RecipeWithIngredients[] mIngredients;
+    private final List<RecipeWithIngredients> mIngredients;
 
-    private final RecipeWithSteps[] mSteps;
+    private final List<RecipeWithSteps> mSteps;
 
-    public RecipeResponse(@NonNull RecipeEntry[] recipes,
-                          @NonNull RecipeWithIngredients[] ingredients,
-                          @NonNull RecipeWithSteps[] steps) {
+    public BakingResponse(@NonNull List<RecipeEntry> recipes,
+                          @NonNull List<RecipeWithIngredients> ingredients,
+                          @NonNull List<RecipeWithSteps> steps) {
         mRecipes = recipes;
         mIngredients = ingredients;
         mSteps = steps;
     }
 
-    public RecipeEntry[] getRecipes() {
+    public List<RecipeEntry> getRecipes() {
         return mRecipes;
     }
 
-    public RecipeWithIngredients[] getIngredients() {
+    public List<RecipeWithIngredients> getIngredients() {
         return mIngredients;
     }
 
-    public RecipeWithSteps[] getSteps() {
+    public List<RecipeWithSteps> getSteps() {
         return mSteps;
     }
 }

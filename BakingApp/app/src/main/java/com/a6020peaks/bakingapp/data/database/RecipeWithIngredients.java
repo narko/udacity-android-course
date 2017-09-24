@@ -3,6 +3,8 @@ package com.a6020peaks.bakingapp.data.database;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
 
+import com.a6020peaks.bakingapp.model.Recipe;
+
 import java.util.List;
 
 /**
@@ -14,6 +16,13 @@ public class RecipeWithIngredients {
     private RecipeEntry recipe;
     @Relation(parentColumn = "id", entityColumn = "recipe_id", entity = IngredientEntry.class)
     private List<IngredientEntry> ingredients;
+
+    public RecipeWithIngredients() {}
+
+    public RecipeWithIngredients(RecipeEntry recipe, List<IngredientEntry> ingredients) {
+        this.recipe = recipe;
+        this.ingredients = ingredients;
+    }
 
     public RecipeEntry getRecipe() {
         return recipe;

@@ -2,6 +2,7 @@ package com.a6020peaks.bakingapp.data.database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
@@ -16,6 +17,9 @@ public class IngredientEntry {
     private String description;
     @ColumnInfo(name = "recipe_id")
     private int recipeId;
+
+    @Ignore
+    public IngredientEntry() {}
 
     public IngredientEntry(int id, int quantity, String measure, String description, int recipeId) {
         this.id = id;

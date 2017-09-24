@@ -9,13 +9,15 @@ import com.a6020peaks.bakingapp.AppExecutors;
 import com.a6020peaks.bakingapp.data.database.IngredientDao;
 import com.a6020peaks.bakingapp.data.database.IngredientEntry;
 import com.a6020peaks.bakingapp.data.database.RecipeDao;
+import com.a6020peaks.bakingapp.data.database.RecipeEntry;
 import com.a6020peaks.bakingapp.data.database.RecipeWithIngredients;
 import com.a6020peaks.bakingapp.data.database.RecipeWithSteps;
 import com.a6020peaks.bakingapp.data.database.StepDao;
 import com.a6020peaks.bakingapp.data.database.StepEntry;
 import com.a6020peaks.bakingapp.data.network.RecipeNetworkDataSource;
-import com.a6020peaks.bakingapp.data.network.RecipeResponse;
+import com.a6020peaks.bakingapp.data.network.BakingResponse;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -39,20 +41,12 @@ public class RecipeRepository {
         mStepDao = stepDao;
         mExecutors = executors;
         mNetworkDataSource = networkDataSource;
-        LiveData<RecipeResponse> networkData = networkDataSource.getRecipeData();
-        networkData.observeForever(new Observer<RecipeResponse>() {
-            @Override
-            public void onChanged(@Nullable final RecipeResponse recipeResponse) {
-                mExecutors.diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Initialize database
-                        initializeDatabase(recipeResponse);
-                        Log.d(TAG, "New values inserted");
-                    }
-                });
-            }
-        });
+        LiveData<BakingResponse> networkData = networkDataSource.getRecipeData();
+        networkData.observeForever(bakingResponse -> mExecutors.diskIO().execute(() -> {
+            // Initialize database
+            initializeDatabase(bakingResponse);
+            Log.d(TAG, "New values inserted");
+        }));
     }
 
     public synchronized static RecipeRepository getInstance(RecipeDao recipeDao, IngredientDao ingredientDao, StepDao stepDao,
@@ -72,14 +66,14 @@ public class RecipeRepository {
      * Current solution to intialize data in v1.0:
      * https://stackoverflow.com/questions/44667160/android-room-insert-relation-entities-using-room
      *
-     * @param recipeResponse
+     * @param bakingResponse
      */
-    private void initializeDatabase(RecipeResponse recipeResponse) {
+    private void initializeDatabase(BakingResponse bakingResponse) {
         // Insert recipes without ingredients and steps
-        mRecipeDao.bulkInsert(recipeResponse.getRecipes());
+        mRecipeDao.bulkInsert(bakingResponse.getRecipes().toArray(new RecipeEntry[]{}));
 
         // Insert ingredients for each recipe
-        RecipeWithIngredients[] recipeWithIngredientsArray = recipeResponse.getIngredients();
+        List<RecipeWithIngredients> recipeWithIngredientsArray = bakingResponse.getIngredients();
         for (RecipeWithIngredients recWithIng : recipeWithIngredientsArray) {
             List<IngredientEntry> ingredients = recWithIng.getIngredients();
             for (IngredientEntry ingredient : ingredients) {
@@ -89,7 +83,7 @@ public class RecipeRepository {
         }
 
         // Insert steps for each recipe
-        RecipeWithSteps[] recipeWithStepsArray = recipeResponse.getSteps();
+        List<RecipeWithSteps> recipeWithStepsArray = bakingResponse.getSteps();
         for (RecipeWithSteps recWithSteps: recipeWithStepsArray) {
             List<StepEntry> steps = recWithSteps.getSteps();
             for (StepEntry step : steps) {

@@ -10,17 +10,26 @@ import android.util.Log;
 
 import com.a6020peaks.bakingapp.AppExecutors;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 /**
  * Provides an API for doing all operations with the server data
  */
 public class RecipeNetworkDataSource {
     private static final String TAG = RecipeNetworkDataSource.class.getSimpleName();
+    private static final String BAKING_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
     private static RecipeNetworkDataSource sInstance;
     private static final Object LOCK = new Object();
 
     private Context mContext;
     private AppExecutors mExecutors;
-    private MutableLiveData<RecipeResponse> mRecipeData;
+    private MutableLiveData<BakingResponse> mRecipeData;
 
 
     private RecipeNetworkDataSource(Context context, AppExecutors executors) {
@@ -44,10 +53,26 @@ public class RecipeNetworkDataSource {
      * Gets the newest recipes from the server
      */
     void fetchRecipeData() {
-        // TODO service call and data parsing
+        Log.d(TAG, "fetch baking data started");
+        mExecutors.networkIO().execute(() -> {
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(BAKING_URL).build();
+            try {
+                Response okResponse = client.newCall(request).execute();
+                BakingResponse bakingResponse = new BakingJsonParser().parse(okResponse.body().string());
+                Log.d(TAG, "Finished parsing JSON data");
+                if (bakingResponse != null) {
+                    mRecipeData.postValue(bakingResponse);
+                }
+            } catch (IOException e) {
+                Log.d(TAG, "error retrieving baking data: " + e.getMessage());
+            } catch (JSONException e) {
+                Log.d(TAG, "error parsing JSON data: " + e.getMessage());
+            }
+        });
     }
 
-    public MutableLiveData<RecipeResponse> getRecipeData() {
+    public MutableLiveData<BakingResponse> getRecipeData() {
         return mRecipeData;
     }
 }
