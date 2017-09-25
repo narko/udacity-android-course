@@ -4,8 +4,10 @@ package com.a6020peaks.bakingapp.data.network;
  * Created by narko on 19/09/17.
  */
 
+import android.app.IntentService;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.a6020peaks.bakingapp.AppExecutors;
@@ -21,10 +23,10 @@ import okhttp3.Response;
 /**
  * Provides an API for doing all operations with the server data
  */
-public class RecipeNetworkDataSource {
-    private static final String TAG = RecipeNetworkDataSource.class.getSimpleName();
+public class BakingNetworkDataSource {
+    private static final String TAG = BakingNetworkDataSource.class.getSimpleName();
     private static final String BAKING_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
-    private static RecipeNetworkDataSource sInstance;
+    private static BakingNetworkDataSource sInstance;
     private static final Object LOCK = new Object();
 
     private Context mContext;
@@ -32,17 +34,17 @@ public class RecipeNetworkDataSource {
     private MutableLiveData<BakingResponse> mRecipeData;
 
 
-    private RecipeNetworkDataSource(Context context, AppExecutors executors) {
+    private BakingNetworkDataSource(Context context, AppExecutors executors) {
         mContext = context;
         mExecutors = executors;
         mRecipeData = new MutableLiveData<>();
     }
 
-    public RecipeNetworkDataSource getInstance(Context context, AppExecutors executors) {
+    public static BakingNetworkDataSource getInstance(Context context, AppExecutors executors) {
         Log.d(TAG, "Getting the network data source");
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new RecipeNetworkDataSource(context, executors);
+                sInstance = new BakingNetworkDataSource(context, executors);
                 Log.d(TAG, "Made new network data source");
             }
         }
@@ -74,5 +76,11 @@ public class RecipeNetworkDataSource {
 
     public MutableLiveData<BakingResponse> getRecipeData() {
         return mRecipeData;
+    }
+
+    public void startFetchDataService() {
+        Intent service = new Intent(mContext, BakingSyncIntentService.class);
+        mContext.startService(service);
+        Log.d(TAG, "Service created");
     }
 }

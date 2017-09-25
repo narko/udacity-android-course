@@ -2,6 +2,7 @@ package com.a6020peaks.bakingapp.data.database;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
@@ -9,8 +10,9 @@ import android.arch.persistence.room.PrimaryKey;
  */
 @Entity(tableName = "step")
 public class StepEntry {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
+    private int remoteId;
     private String shortDescription;
     private String description;
     private String videoUrl;
@@ -18,8 +20,19 @@ public class StepEntry {
     @ColumnInfo(name = "recipe_id")
     private int recipeId;
 
-    public StepEntry(int id, String shortDescription, String description, String videoUrl, String thumbnailUrl, int recipeId) {
+    @Ignore
+    public StepEntry(int remoteId, String shortDescription, String description, String videoUrl, String thumbnailUrl, int recipeId) {
+        this.recipeId = remoteId;
+        this.shortDescription = shortDescription;
+        this.description = description;
+        this.videoUrl = videoUrl;
+        this.thumbnailUrl = thumbnailUrl;
+        this.recipeId = recipeId;
+    }
+
+    public StepEntry(int id, int remoteId, String shortDescription, String description, String videoUrl, String thumbnailUrl, int recipeId) {
         this.id = id;
+        this.recipeId = remoteId;
         this.shortDescription = shortDescription;
         this.description = description;
         this.videoUrl = videoUrl;
@@ -73,5 +86,13 @@ public class StepEntry {
 
     public void setRecipeId(int recipeId) {
         this.recipeId = recipeId;
+    }
+
+    public int getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(int remoteId) {
+        this.remoteId = remoteId;
     }
 }

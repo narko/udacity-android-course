@@ -15,7 +15,7 @@ public abstract class RecipeDatabase extends RoomDatabase{
     private static volatile RecipeDatabase sInstance;
     private static final Object LOCK = new Object();
 
-    private RecipeDatabase getInstance(Context context) {
+    public static RecipeDatabase getInstance(Context context) {
         if (sInstance == null) {
             synchronized (LOCK) {
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),

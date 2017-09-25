@@ -15,7 +15,7 @@ buildscript {
     }
 }
 
-ext.arch_version = "1.0.0-alpha9-1"
+ext.arch_version = "1.0.0-beta1"
 
 allprojects {
     repositories {

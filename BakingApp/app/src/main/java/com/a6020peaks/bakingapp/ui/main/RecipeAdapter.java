@@ -1,4 +1,4 @@
-package com.a6020peaks.bakingapp.ui;
+package com.a6020peaks.bakingapp.ui.main;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.a6020peaks.bakingapp.R;
+import com.a6020peaks.bakingapp.data.database.RecipeEntry;
 import com.a6020peaks.bakingapp.model.Recipe;
 import com.squareup.picasso.Picasso;
 
@@ -18,15 +19,14 @@ import java.util.List;
  */
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
-    private List<Recipe> mRecipes; // TODO replace with Cursor
+    private List<RecipeEntry> mRecipes; // TODO replace with Cursor
     private OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener {
-        void onItemClick(Recipe item);
+        void onItemClick(RecipeEntry item);
     }
 
-    public RecipeAdapter(List<Recipe> recipes, OnItemClickListener listener) {
-        mRecipes = recipes;
+    public RecipeAdapter(OnItemClickListener listener) {
         onItemClickListener = listener;
     }
 
@@ -46,6 +46,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         return mRecipes != null ? mRecipes.size() : 0;
     }
 
+    public void swapData(List<RecipeEntry> newRecipes) {
+        mRecipes = newRecipes;
+        notifyDataSetChanged();
+    }
+
     static class RecipeViewHolder extends RecyclerView.ViewHolder {
         private TextView titleTv;
         private ImageView thumbnail;
@@ -56,13 +61,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             thumbnail = itemView.findViewById(R.id.image);
         }
 
-        public void bind(final Recipe item, final OnItemClickListener listener) {
+        public void bind(final RecipeEntry item, final OnItemClickListener listener) {
             titleTv.setText(item.getName());
-            Picasso.with(itemView.getContext())
-                    .load(item.getImage())
-                    .placeholder(R.drawable.default_placeholder)
-                    .error(R.drawable.default_placeholder)
-                    .into(thumbnail);
+            String imagePath = item.getImage();
+            if (imagePath != null && !imagePath.isEmpty()) {
+                Picasso.with(itemView.getContext())
+                        .load(imagePath)
+                        .placeholder(R.drawable.default_placeholder)
+                        .error(R.drawable.default_placeholder)
+                        .into(thumbnail);
+            } else {
+                Picasso.with(itemView.getContext())
+                        .load(R.drawable.default_placeholder)
+                        .error(R.drawable.default_placeholder)
+                        .into(thumbnail);
+            }
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

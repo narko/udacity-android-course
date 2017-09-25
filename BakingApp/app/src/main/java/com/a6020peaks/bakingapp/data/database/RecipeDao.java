@@ -1,5 +1,6 @@
 package com.a6020peaks.bakingapp.data.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -24,4 +25,10 @@ public interface RecipeDao {
 
     @Query("SELECT * FROM recipe, ingredient WHERE recipe.id = :recipeId AND ingredient.recipe_id = recipe.id")
     RecipeWithIngredients getRecipeWithIngredients(int recipeId);
+
+    @Query("SELECT * FROM recipe")
+    LiveData<List<RecipeEntry>> getRecipes();
+
+    @Query("DELETE FROM recipe")
+    void deleteAll();
 }

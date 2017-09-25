@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.a6020peaks.bakingapp.MainActivity">
+    tools:context="com.a6020peaks.bakingapp.ui.main.MainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recipe_rv"

@@ -1,8 +1,6 @@
 package com.a6020peaks.bakingapp.data;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.a6020peaks.bakingapp.AppExecutors;
@@ -14,10 +12,9 @@ import com.a6020peaks.bakingapp.data.database.RecipeWithIngredients;
 import com.a6020peaks.bakingapp.data.database.RecipeWithSteps;
 import com.a6020peaks.bakingapp.data.database.StepDao;
 import com.a6020peaks.bakingapp.data.database.StepEntry;
-import com.a6020peaks.bakingapp.data.network.RecipeNetworkDataSource;
+import com.a6020peaks.bakingapp.data.network.BakingNetworkDataSource;
 import com.a6020peaks.bakingapp.data.network.BakingResponse;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -32,10 +29,10 @@ public class RecipeRepository {
     private final IngredientDao mIngredientDao;
     private final StepDao mStepDao;
     private final AppExecutors mExecutors;
-    private final RecipeNetworkDataSource mNetworkDataSource;
+    private final BakingNetworkDataSource mNetworkDataSource;
 
     private RecipeRepository(RecipeDao recipeDao, IngredientDao ingredientDao, StepDao stepDao,
-                             AppExecutors executors, RecipeNetworkDataSource networkDataSource) {
+                             AppExecutors executors, BakingNetworkDataSource networkDataSource) {
         mRecipeDao = recipeDao;
         mIngredientDao = ingredientDao;
         mStepDao = stepDao;
@@ -44,13 +41,14 @@ public class RecipeRepository {
         LiveData<BakingResponse> networkData = networkDataSource.getRecipeData();
         networkData.observeForever(bakingResponse -> mExecutors.diskIO().execute(() -> {
             // Initialize database
-            initializeDatabase(bakingResponse);
+            deleteDatabase();
+            updateDatabase(bakingResponse);
             Log.d(TAG, "New values inserted");
         }));
     }
 
     public synchronized static RecipeRepository getInstance(RecipeDao recipeDao, IngredientDao ingredientDao, StepDao stepDao,
-                                                            AppExecutors executors, RecipeNetworkDataSource networkDataSource) {
+                                                            AppExecutors executors, BakingNetworkDataSource networkDataSource) {
         Log.d(TAG, "Getting the repository");
         if (sInstance == null) {
             synchronized (LOCK) {
@@ -68,7 +66,7 @@ public class RecipeRepository {
      *
      * @param bakingResponse
      */
-    private void initializeDatabase(BakingResponse bakingResponse) {
+    private void updateDatabase(BakingResponse bakingResponse) {
         // Insert recipes without ingredients and steps
         mRecipeDao.bulkInsert(bakingResponse.getRecipes().toArray(new RecipeEntry[]{}));
 
@@ -92,5 +90,26 @@ public class RecipeRepository {
             mStepDao.bulkInsert(steps.toArray(new StepEntry[]{}));
         }
 
+    }
+
+    private synchronized void initializeDatabase() {
+        mExecutors.networkIO().execute(() -> {
+            startFetchDataService();
+        });
+    }
+
+    private void deleteDatabase() {
+        mRecipeDao.deleteAll();
+        mIngredientDao.deleteAll();
+        mStepDao.deleteAll();
+    }
+
+    public void startFetchDataService() {
+        mNetworkDataSource.startFetchDataService();
+    }
+
+    public LiveData<List<RecipeEntry>> getRecipes() {
+        initializeDatabase();
+        return mRecipeDao.getRecipes();
     }
 }
