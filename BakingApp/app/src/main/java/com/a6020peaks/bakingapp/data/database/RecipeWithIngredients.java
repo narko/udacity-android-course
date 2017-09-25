@@ -3,8 +3,6 @@ package com.a6020peaks.bakingapp.data.database;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
 
-import com.a6020peaks.bakingapp.model.Recipe;
-
 import java.util.List;
 
 /**

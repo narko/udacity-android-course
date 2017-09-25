@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.a6020peaks.bakingapp.R;
 import com.a6020peaks.bakingapp.data.database.RecipeEntry;
-import com.a6020peaks.bakingapp.model.Recipe;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
-    private List<RecipeEntry> mRecipes; // TODO replace with Cursor
+    private List<RecipeEntry> mRecipes;
     private OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener {
