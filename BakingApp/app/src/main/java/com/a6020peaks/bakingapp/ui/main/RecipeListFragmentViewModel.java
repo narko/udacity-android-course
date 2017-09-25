@@ -12,11 +12,11 @@ import java.util.List;
  * Created by narko on 24/09/17.
  */
 
-public class MainActivityViewModel extends ViewModel {
+public class RecipeListFragmentViewModel extends ViewModel {
     private RecipeRepository mRepository;
     private LiveData<List<RecipeEntry>> mRecipeList;
 
-    public MainActivityViewModel(RecipeRepository repository) {
+    public RecipeListFragmentViewModel(RecipeRepository repository) {
         mRepository = repository;
         mRecipeList = repository.getRecipes();
     }

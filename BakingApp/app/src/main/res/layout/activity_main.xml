@@ -6,16 +6,9 @@
     android:orientation="vertical"
     tools:context="com.a6020peaks.bakingapp.ui.main.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recipe_rv"
+    <FrameLayout
+        android:id="@+id/recipe_list_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:id="@+id/empty_recipes_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/message_empty_recipe_list"
-        android:visibility="gone"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>
