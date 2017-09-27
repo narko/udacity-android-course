@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.main.MainActivity">
+        <activity android:name=".ui.list.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,8 +19,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".data.network.BakingSyncIntentService"
-            android:exported="false"/>
+        <service
+            android:name=".data.network.BakingSyncIntentService"
+            android:exported="false" />
+
+        <activity android:name=".ui.details.DetailsActivity"></activity>
     </application>
 
 </manifest>

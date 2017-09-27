@@ -1,4 +1,4 @@
-package com.a6020peaks.bakingapp.ui.main;
+package com.a6020peaks.bakingapp.ui.list;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;

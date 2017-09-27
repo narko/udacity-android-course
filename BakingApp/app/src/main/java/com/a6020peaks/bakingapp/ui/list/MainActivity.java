@@ -1,4 +1,4 @@
-package com.a6020peaks.bakingapp.ui.main;
+package com.a6020peaks.bakingapp.ui.list;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -12,9 +12,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RecipeListFragment recipeListFragment = new RecipeListFragment();
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.recipe_list_fragment, recipeListFragment).commit();
     }
 }

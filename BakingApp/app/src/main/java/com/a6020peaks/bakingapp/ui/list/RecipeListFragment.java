@@ -1,6 +1,7 @@
-package com.a6020peaks.bakingapp.ui.main;
+package com.a6020peaks.bakingapp.ui.list;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.a6020peaks.bakingapp.R;
 import com.a6020peaks.bakingapp.data.database.RecipeEntry;
+import com.a6020peaks.bakingapp.ui.details.DetailsActivity;
 import com.a6020peaks.bakingapp.utils.InjectorUtils;
 
 /**
@@ -29,7 +31,7 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnItem
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recipe_list, container, false);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recipe_rv);
+        mRecyclerView = rootView.findViewById(R.id.recipe_rv);
         mRecipeAdapter = new RecipeAdapter(this);
         mRecyclerView.setAdapter(mRecipeAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -45,6 +47,8 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnItem
 
     @Override
     public void onItemClick(RecipeEntry item) {
-
+        Intent intent = new Intent(getContext(), DetailsActivity.class);
+        intent.putExtra(DetailsActivity.Companion.getRECIPE_ID(), item.getId());
+        startActivity(intent);
     }
 }

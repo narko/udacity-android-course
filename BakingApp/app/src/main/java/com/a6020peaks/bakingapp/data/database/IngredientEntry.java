@@ -5,6 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.List;
+
 /**
  * Created by narko on 18/09/17.
  */
@@ -68,4 +70,20 @@ public class IngredientEntry {
     public void setRecipeId(int recipeId) {
         this.recipeId = recipeId;
     }
-}
+
+    @Override
+    public String toString() {
+        return  quantity + " " + measure + ", " + description;
+    }
+
+    public static String generateIngredientText(List<IngredientEntry> ingredients) {
+        if (ingredients == null || ingredients.size() == 0) return "";
+
+        StringBuilder sb = new StringBuilder();
+        for (IngredientEntry ingredient: ingredients) {
+            sb.append(ingredient.toString() + "\n");
+        }
+
+        return sb.toString();
+    }
+ }

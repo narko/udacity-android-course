@@ -1,12 +1,14 @@
 package com.a6020peaks.bakingapp.data;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
 import com.a6020peaks.bakingapp.AppExecutors;
 import com.a6020peaks.bakingapp.data.database.IngredientDao;
 import com.a6020peaks.bakingapp.data.database.IngredientEntry;
 import com.a6020peaks.bakingapp.data.database.RecipeDao;
+import com.a6020peaks.bakingapp.data.database.RecipeDetails;
 import com.a6020peaks.bakingapp.data.database.RecipeEntry;
 import com.a6020peaks.bakingapp.data.database.RecipeWithIngredients;
 import com.a6020peaks.bakingapp.data.database.RecipeWithSteps;
@@ -42,7 +44,7 @@ public class RecipeRepository {
         networkData.observeForever(bakingResponse -> mExecutors.diskIO().execute(() -> {
             // Initialize database
             deleteDatabase();
-            updateDatabase(bakingResponse);
+            persistNetworkData(bakingResponse);
             Log.d(TAG, "New values inserted");
         }));
     }
@@ -66,7 +68,7 @@ public class RecipeRepository {
      *
      * @param bakingResponse
      */
-    private void updateDatabase(BakingResponse bakingResponse) {
+    private void persistNetworkData(BakingResponse bakingResponse) {
         // Insert recipes without ingredients and steps
         mRecipeDao.bulkInsert(bakingResponse.getRecipes().toArray(new RecipeEntry[]{}));
 
@@ -111,5 +113,41 @@ public class RecipeRepository {
     public LiveData<List<RecipeEntry>> getRecipes() {
         initializeDatabase();
         return mRecipeDao.getRecipes();
+    }
+
+    public RecipeWithIngredients getRecipeWithIngredients(int recipeId) {
+        return mRecipeDao.getRecipeWithIngredients(recipeId);
+    }
+
+    public LiveData<List<IngredientEntry>> getIngredients(int recipeId) {
+        return mIngredientDao.getRecipeIngredients(recipeId);
+    }
+
+    public LiveData<List<StepEntry>> getSteps(int recipeId) {
+        return mStepDao.getRecipeSteps(recipeId);
+    }
+
+
+    public LiveData<RecipeDetails> getRecipeDetails(int recipeId) {
+        MutableLiveData<RecipeDetails> detailsLiveData = new MutableLiveData<>();
+        mExecutors.diskIO().execute(() -> {
+            detailsLiveData.postValue(retrieveRecipeDetails(recipeId));
+        });
+
+        return detailsLiveData;
+    }
+
+    private RecipeDetails retrieveRecipeDetails(int recipeId) {
+        final RecipeDetails details = new RecipeDetails();
+        RecipeWithIngredients ingredients = mRecipeDao.getRecipeWithIngredients(recipeId);
+        if (ingredients != null) {
+            details.setIngredients(ingredients.getIngredients());
+        }
+        RecipeWithSteps steps = mRecipeDao.getRecipeWithSteps(recipeId);
+        if (steps != null) {
+            details.setSteps(steps.getSteps());
+        }
+
+        return details;
     }
 }

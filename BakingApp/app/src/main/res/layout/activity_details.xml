@@ -3,12 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.a6020peaks.bakingapp.ui.list.MainActivity">
+    tools:context="com.a6020peaks.bakingapp.ui.details.DetailsActivity">
 
-    <fragment
-        android:id="@+id/recipe_list_fragment"
+    <FrameLayout
+        android:id="@+id/details_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.a6020peaks.bakingapp.ui.list.RecipeListFragment"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

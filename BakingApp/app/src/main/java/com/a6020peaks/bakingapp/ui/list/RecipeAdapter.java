@@ -1,4 +1,4 @@
-package com.a6020peaks.bakingapp.ui.main;
+package com.a6020peaks.bakingapp.ui.list;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -75,12 +75,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                         .error(R.drawable.default_placeholder)
                         .into(thumbnail);
             }
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onItemClick(item);
-                }
-            });
+            itemView.setOnClickListener(view -> listener.onItemClick(item));
         }
     }
 }
