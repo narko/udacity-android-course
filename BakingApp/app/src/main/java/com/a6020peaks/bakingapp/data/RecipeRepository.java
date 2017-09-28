@@ -127,6 +127,9 @@ public class RecipeRepository {
         return mStepDao.getRecipeSteps(recipeId);
     }
 
+    public LiveData<StepEntry> getStep(int stepId) {
+        return mStepDao.getStep(stepId);
+    }
 
     public LiveData<RecipeDetails> getRecipeDetails(int recipeId) {
         MutableLiveData<RecipeDetails> detailsLiveData = new MutableLiveData<>();

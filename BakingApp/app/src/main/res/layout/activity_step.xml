@@ -6,9 +6,14 @@
     android:layout_height="match_parent"
     tools:context="com.a6020peaks.bakingapp.ui.steps.StepActivity">
 
-    <fragment
-        android:id="@+id/fragment_step"
+    <!--<fragment-->
+        <!--android:id="@+id/fragment_step"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:name="com.a6020peaks.bakingapp.ui.steps.StepDetailsFragment"/>-->
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/stepPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.a6020peaks.bakingapp.ui.steps.StepDetailsFragment"/>
+        android:layout_height="match_parent"/>
 </android.support.constraint.ConstraintLayout>

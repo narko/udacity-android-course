@@ -25,11 +25,12 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
     private RecyclerView mDetailsRv;
     private RecipeDetailsAdapter mAdapter;
     private RecipeDetailsFragmentViewModel mViewModel;
+    private int mStepAmount;
 
     private OnStepItemClickListener mOnStepItemClickListener;
 
     public interface OnStepItemClickListener {
-        void onStepItemClick(StepEntry item);
+        void onStepItemClick(StepEntry item, int stepAmount);
     }
 
     public static RecipeDetailsFragment create(int recipeId) {
@@ -78,6 +79,7 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
         });
 
         mViewModel.getSteps().observe(this, steps -> {
+            mStepAmount = steps != null ? steps.size() : 0;
             mAdapter.swapSteps(steps);
         });
 
@@ -86,6 +88,6 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
 
     @Override
     public void onStepItemClick(StepEntry item) {
-        mOnStepItemClickListener.onStepItemClick(item);
+        mOnStepItemClickListener.onStepItemClick(item, mStepAmount);
     }
 }

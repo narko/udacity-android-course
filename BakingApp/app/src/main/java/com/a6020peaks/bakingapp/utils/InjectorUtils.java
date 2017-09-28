@@ -8,6 +8,8 @@ import com.a6020peaks.bakingapp.data.database.RecipeDatabase;
 import com.a6020peaks.bakingapp.data.network.BakingNetworkDataSource;
 import com.a6020peaks.bakingapp.ui.details.RecipeDetailsFragmentViewModelFactory;
 import com.a6020peaks.bakingapp.ui.list.RecipeListFragmentViewModelFactory;
+import com.a6020peaks.bakingapp.ui.steps.StepDetailsFragmentViewModel;
+import com.a6020peaks.bakingapp.ui.steps.StepDetailsFragmentViewModelFactory;
 
 /**
  * Created by narko on 24/09/17.
@@ -37,5 +39,10 @@ public class InjectorUtils {
     public static RecipeDetailsFragmentViewModelFactory provideRecipeDetailsFragmentViewModelFactory(Context context, int recipeId) {
         RecipeRepository repository = provideRepository(context);
         return new RecipeDetailsFragmentViewModelFactory(repository, recipeId);
+    }
+
+    public static StepDetailsFragmentViewModelFactory provideStepDetailsFragmentViewModelFactory(Context context, int stepId) {
+        RecipeRepository repository = provideRepository(context);
+        return new StepDetailsFragmentViewModelFactory(repository, stepId);
     }
 }

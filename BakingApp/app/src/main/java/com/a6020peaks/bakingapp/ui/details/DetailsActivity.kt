@@ -29,10 +29,12 @@ class DetailsActivity : AppCompatActivity(), OnStepItemClickListener {
                 .commit()
     }
 
-    override fun onStepItemClick(item: StepEntry) {
+    override fun onStepItemClick(item: StepEntry, stepAmount: Int) {
         Log.d(TAG, "Starting activity for step " + item.id)
         val intent = Intent(this, StepActivity::class.java)
         intent.putExtra(StepActivity.STEP_ID, item.id)
+        intent.putExtra(StepActivity.STEP_REMOTE_ID, item.remoteId)
+        intent.putExtra(StepActivity.STEP_AMOUNT, stepAmount)
         startActivity(intent)
     }
 }
