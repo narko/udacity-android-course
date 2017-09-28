@@ -12,19 +12,17 @@ public class StepSlidePagerAdapter extends FragmentStatePagerAdapter {
     private int stepAmount;
     private int stepId;
     private int stepRemoteId;
-    private int initialStepId;
 
     public StepSlidePagerAdapter(FragmentManager fm, int stepId, int stepRemoteId, int stepAmount) {
         super(fm);
         this.stepId = stepId;
         this.stepRemoteId = stepRemoteId;
         this.stepAmount = stepAmount;
-        initialStepId = stepId - stepRemoteId;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return StepDetailsFragment.create(initialStepId + position);
+        return StepDetailsFragment.create(stepId - stepRemoteId + position);
     }
 
     @Override
