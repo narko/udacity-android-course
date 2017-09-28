@@ -53,14 +53,14 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 ((IngredientViewHolder)holder).bind();
                 break;
             case 1:
-                ((StepViewHolder)holder).bind(mSteps.get(position), mOnStepItemClickListener);
+                ((StepViewHolder)holder).bind(mSteps.get(position-1), mOnStepItemClickListener);
                 break;
         }
     }
 
     @Override
     public int getItemCount() {
-        return mSteps != null? mSteps.size() : 0; // There are always one item for ingredients
+        return mSteps != null? 1 + mSteps.size() : 1; // There are always one item for ingredients
     }
 
     @Override
