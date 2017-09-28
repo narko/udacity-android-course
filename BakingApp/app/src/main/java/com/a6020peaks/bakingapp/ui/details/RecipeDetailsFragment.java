@@ -1,13 +1,12 @@
 package com.a6020peaks.bakingapp.ui.details;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,6 @@ import android.view.ViewGroup;
 import com.a6020peaks.bakingapp.R;
 import com.a6020peaks.bakingapp.data.database.StepEntry;
 import com.a6020peaks.bakingapp.utils.InjectorUtils;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by narko on 25/09/17.
@@ -29,6 +26,11 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
     private RecipeDetailsAdapter mAdapter;
     private RecipeDetailsFragmentViewModel mViewModel;
 
+    private OnStepItemClickListener mOnStepItemClickListener;
+
+    public interface OnStepItemClickListener {
+        void onStepItemClick(StepEntry item);
+    }
 
     public static RecipeDetailsFragment create(int recipeId) {
         RecipeDetailsFragment fragment = new RecipeDetailsFragment();
@@ -37,6 +39,17 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
         fragment.setArguments(args);
 
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mOnStepItemClickListener = (OnStepItemClickListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnStepItemClick");
+        }
     }
 
     @Nullable
@@ -73,6 +86,6 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
 
     @Override
     public void onStepItemClick(StepEntry item) {
-        Log.d(TAG, item.getShortDescription());
+        mOnStepItemClickListener.onStepItemClick(item);
     }
 }

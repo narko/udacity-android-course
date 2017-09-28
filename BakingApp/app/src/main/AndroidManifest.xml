@@ -23,7 +23,8 @@
             android:name=".data.network.BakingSyncIntentService"
             android:exported="false" />
 
-        <activity android:name=".ui.details.DetailsActivity"></activity>
+        <activity android:name=".ui.details.DetailsActivity" />
+        <activity android:name=".ui.steps.StepActivity"/>
     </application>
 
 </manifest>
