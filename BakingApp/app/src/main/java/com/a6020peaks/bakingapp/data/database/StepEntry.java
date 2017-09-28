@@ -22,7 +22,7 @@ public class StepEntry {
 
     @Ignore
     public StepEntry(int remoteId, String shortDescription, String description, String videoUrl, String thumbnailUrl, int recipeId) {
-        this.recipeId = remoteId;
+        this.remoteId = remoteId;
         this.shortDescription = shortDescription;
         this.description = description;
         this.videoUrl = videoUrl;
@@ -32,7 +32,7 @@ public class StepEntry {
 
     public StepEntry(int id, int remoteId, String shortDescription, String description, String videoUrl, String thumbnailUrl, int recipeId) {
         this.id = id;
-        this.recipeId = remoteId;
+        this.remoteId = remoteId;
         this.shortDescription = shortDescription;
         this.description = description;
         this.videoUrl = videoUrl;
