@@ -32,6 +32,10 @@ public class StepSlidePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
-        return stepRemoteId;
+        if (object instanceof StepDetailsFragment) {
+            return POSITION_NONE;
+        } else {
+            return POSITION_UNCHANGED;
+        }
     }
 }

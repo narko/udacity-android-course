@@ -2,9 +2,11 @@ package com.a6020peaks.bakingapp.ui.list;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,8 +36,12 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnItem
         mRecyclerView = rootView.findViewById(R.id.recipe_rv);
         mRecipeAdapter = new RecipeAdapter(this);
         mRecyclerView.setAdapter(mRecipeAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        } else {
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        }
         RecipeListFragmentViewModelFactory factory = InjectorUtils.provideRecipeListFragmentViewModelFactory(getContext());
         mViewModel = ViewModelProviders.of(this, factory).get(RecipeListFragmentViewModel.class);
         mViewModel.getRecipes().observe(this, recipeEntries -> {

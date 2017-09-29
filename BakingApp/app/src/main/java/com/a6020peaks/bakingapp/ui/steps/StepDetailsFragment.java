@@ -2,7 +2,6 @@ package com.a6020peaks.bakingapp.ui.steps;
 
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -108,7 +107,7 @@ public class StepDetailsFragment extends Fragment {
             }
         }
 
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (rootView.findViewById(R.id.step_info) != null) {
             TextView title = rootView.findViewById(R.id.step_title);
             title.setText(step.getShortDescription());
             TextView desc = rootView.findViewById(R.id.step_desc);
@@ -117,9 +116,11 @@ public class StepDetailsFragment extends Fragment {
     }
 
     private void releasePlayer() {
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     @Override
