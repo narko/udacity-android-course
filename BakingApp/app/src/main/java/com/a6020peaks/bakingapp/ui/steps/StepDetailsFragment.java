@@ -2,11 +2,13 @@ package com.a6020peaks.bakingapp.ui.steps;
 
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +39,6 @@ public class StepDetailsFragment extends Fragment {
     private static final String TAG = StepDetailsFragment.class.getSimpleName();
     private static final String STEP_ID = "step_id";
     private StepDetailsFragmentViewModel mViewModel;
-    private PlaybackStateCompat.Builder mStateBuilder;
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
 
@@ -71,16 +72,6 @@ public class StepDetailsFragment extends Fragment {
 
     private void updateView(View rootView, StepEntry step) {
         mPlayerView = rootView.findViewById(R.id.view_player);
-
-        Uri videoUri = Uri.parse(step.getVideoUrl());
-        Log.d(TAG, "Playing " + videoUri.toString());
-        initializeMediaPlayer(videoUri);
-
-        TextView desc = rootView.findViewById(R.id.step_desc);
-        desc.setText(step.getDescription());
-    }
-
-    private void initializeMediaPlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
@@ -88,15 +79,40 @@ public class StepDetailsFragment extends Fragment {
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
 
+
             // Set the ExoPlayer.EventListener to this activity.
             //mExoPlayer.addListener(this);
 
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            Uri mediaUri = Uri.parse(step.getVideoUrl());
+            boolean loadMediaUri = false;
+            if (mediaUri == null) { // No video available in JSON
+                mediaUri = Uri.parse(step.getThumbnailUrl());
+                if (mediaUri == null) {
+                    Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.default_placeholder);
+                    mPlayerView.setDefaultArtwork(image);
+                } else {
+                    loadMediaUri = true;
+                }
+            } else {
+                loadMediaUri = true;
+            }
+            if (loadMediaUri) {
+                MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
+                        new DefaultDataSourceFactory(getContext(), userAgent),
+                        new DefaultExtractorsFactory(), null, null);
+                mExoPlayer.prepare(mediaSource);
+                Log.d(TAG, "Playing " + mediaUri.toString());
+                mExoPlayer.setPlayWhenReady(true);
+            }
+        }
+
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            TextView title = rootView.findViewById(R.id.step_title);
+            title.setText(step.getShortDescription());
+            TextView desc = rootView.findViewById(R.id.step_desc);
+            desc.setText(step.getDescription());
         }
     }
 
