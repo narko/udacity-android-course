@@ -42,7 +42,7 @@ class DetailsActivity : AppCompatActivity(), OnStepItemClickListener {
         val recipeId = intent.getIntExtra(RECIPE_ID, 0)
         val manager = supportFragmentManager
         manager.beginTransaction()
-                .add(R.id.details_fragment, RecipeDetailsFragment.create(recipeId))
+                .replace(R.id.details_fragment, RecipeDetailsFragment.create(recipeId))
                 .commit()
 
         if (mTwoPane) {
