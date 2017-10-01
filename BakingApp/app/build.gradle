@@ -48,6 +48,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.google.android.exoplayer:exoplayer:r2.5.2'
+    compile 'com.pacioianu.david:ink-page-indicator:1.2.0'
 
     // Architecture components
     compile "android.arch.persistence.room:runtime:$arch_version"
