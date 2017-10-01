@@ -115,6 +115,10 @@ public class RecipeRepository {
         return mRecipeDao.getRecipes();
     }
 
+    public RecipeEntry getRecipe(int recipeId) {
+        return mRecipeDao.getRecipe(recipeId);
+    }
+
     public RecipeWithIngredients getRecipeWithIngredients(int recipeId) {
         return mRecipeDao.getRecipeWithIngredients(recipeId);
     }

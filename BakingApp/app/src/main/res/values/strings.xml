@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">BakingApp</string>
     <string name="message_empty_recipe_list">No recipes available</string>
+    <string name="appwidget_text">RECIPE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

@@ -2,8 +2,10 @@ package com.a6020peaks.bakingapp.ui.list;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,6 +18,8 @@ import android.view.ViewGroup;
 import com.a6020peaks.bakingapp.R;
 import com.a6020peaks.bakingapp.data.database.RecipeEntry;
 import com.a6020peaks.bakingapp.ui.details.DetailsActivity;
+import com.a6020peaks.bakingapp.ui.widget.RecipeAppWidget;
+import com.a6020peaks.bakingapp.ui.widget.RecipeIntentService;
 import com.a6020peaks.bakingapp.utils.InjectorUtils;
 
 /**
@@ -53,6 +57,9 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnItem
 
     @Override
     public void onItemClick(RecipeEntry item) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        preferences.edit().putInt(RecipeAppWidget.RECIPE_ID, item.getId()).apply();
+        RecipeIntentService.startActionGetIngredients(getContext(), item.getId());
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.Companion.getRECIPE_ID(), item.getId());
         startActivity(intent);

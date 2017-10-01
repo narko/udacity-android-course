@@ -24,7 +24,21 @@
             android:exported="false" />
 
         <activity android:name=".ui.details.DetailsActivity" />
-        <activity android:name=".ui.steps.StepActivity"/>
+        <activity android:name=".ui.steps.StepActivity" />
+
+        <receiver android:name=".ui.widget.RecipeAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/recipe_app_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".ui.widget.RecipeIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
