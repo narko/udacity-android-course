@@ -1,0 +1,10 @@
+//package com.a6020peaks.bakingapp.data.database
+//
+///**
+// * Created by narko on 25/09/17.
+// */
+//
+//class RecipeDetails {
+//    var ingredients: List<IngredientEntry>? = null
+//    var steps: List<StepEntry>? = null
+//}

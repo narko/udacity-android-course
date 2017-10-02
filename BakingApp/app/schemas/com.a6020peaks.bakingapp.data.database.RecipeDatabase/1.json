@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "bd8bd3c690fcce55fd7ef3a10e1babdf",
+    "identityHash": "71d0059ae2c89c574a0a70bb4df14f6e",
     "entities": [
       {
         "tableName": "recipe",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `image` TEXT, `name` TEXT, `servings` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT, `image` TEXT, `servings` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,14 +15,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "image",
-            "columnName": "image",
+            "fieldPath": "name",
+            "columnName": "name",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "name",
-            "columnName": "name",
+            "fieldPath": "image",
+            "columnName": "image",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -44,17 +44,17 @@
       },
       {
         "tableName": "ingredient",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`description` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `measure` TEXT, `quantity` INTEGER NOT NULL, `recipe_id` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `quantity` INTEGER NOT NULL, `measure` TEXT, `description` TEXT, `recipe_id` INTEGER NOT NULL)",
         "fields": [
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
-          },
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -65,10 +65,10 @@
             "notNull": false
           },
           {
-            "fieldPath": "quantity",
-            "columnName": "quantity",
-            "affinity": "INTEGER",
-            "notNull": true
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "recipeId",
@@ -88,23 +88,11 @@
       },
       {
         "tableName": "step",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`description` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `recipe_id` INTEGER NOT NULL, `remoteId` INTEGER NOT NULL, `shortDescription` TEXT, `thumbnailUrl` TEXT, `videoUrl` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remoteId` INTEGER NOT NULL, `shortDescription` TEXT, `description` TEXT, `videoUrl` TEXT, `thumbnailUrl` TEXT, `recipe_id` INTEGER NOT NULL)",
         "fields": [
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
-          },
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "recipeId",
-            "columnName": "recipe_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -121,8 +109,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "thumbnailUrl",
-            "columnName": "thumbnailUrl",
+            "fieldPath": "description",
+            "columnName": "description",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -131,6 +119,18 @@
             "columnName": "videoUrl",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "thumbnailUrl",
+            "columnName": "thumbnailUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "recipeId",
+            "columnName": "recipe_id",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -145,7 +145,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"bd8bd3c690fcce55fd7ef3a10e1babdf\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"71d0059ae2c89c574a0a70bb4df14f6e\")"
     ]
   }
 }

@@ -27,7 +27,7 @@ public class RecipeAppWidget extends AppWidgetProvider {
 
         // Set on click event
         Intent intent = new Intent(context, DetailsActivity.class);
-        intent.putExtra(DetailsActivity.Companion.getRECIPE_ID(), recipeId);
+        intent.putExtra(DetailsActivity.RECIPE_ID, recipeId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.appwidget_recipe, pendingIntent);
 

@@ -61,7 +61,7 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnItem
         preferences.edit().putInt(RecipeAppWidget.RECIPE_ID, item.getId()).apply();
         RecipeIntentService.startActionGetIngredients(getContext(), item.getId());
         Intent intent = new Intent(getContext(), DetailsActivity.class);
-        intent.putExtra(DetailsActivity.Companion.getRECIPE_ID(), item.getId());
+        intent.putExtra(DetailsActivity.RECIPE_ID, item.getId());
         startActivity(intent);
     }
 }
