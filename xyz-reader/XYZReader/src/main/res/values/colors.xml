@@ -19,7 +19,7 @@
     <color name="photo_placeholder">#ccc</color>
 
     <color name="color_primary">#ffd54f</color>
-    <color name="color_primary_dark">#c8a415</color>
+    <color name="color_primary_dark">#000000</color>
     <color name="color_accent">#2196f3</color>
     <color name="ltgray">#ffe0e0e0</color>
     <color name="dark_gray">#ff60a0a0</color>
