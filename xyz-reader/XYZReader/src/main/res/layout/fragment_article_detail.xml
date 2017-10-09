@@ -78,16 +78,15 @@
 
     <include layout="@layout/article_content"/>
 
-    <ImageButton android:id="@+id/share_fab"
-        android:stateListAnimator="@anim/fab_state_list_anim"
-        android:background="@drawable/add_fab_background"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginBottom="@dimen/fab_margin"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/share_fab"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:elevation="6dp"
+        app:fabSize="normal"
+        app:pressedTranslationZ="12dp"
         android:src="@drawable/ic_share"
-        android:elevation="@dimen/fab_elevation"
-        android:contentDescription="@string/action_share" />
+        android:layout_gravity="bottom|end"/>
 
 </android.support.design.widget.CoordinatorLayout>
