@@ -78,7 +78,13 @@ public class DetailsActivity extends AppCompatActivity implements OnStepItemClic
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putInt(RECIPE_ID, mRecipeId);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

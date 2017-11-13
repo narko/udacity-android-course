@@ -128,6 +128,18 @@ public class StepDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        releasePlayer();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        releasePlayer();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         initializePlayer();

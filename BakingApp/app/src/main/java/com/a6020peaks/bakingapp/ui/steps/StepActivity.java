@@ -34,4 +34,10 @@ public class StepActivity extends AppCompatActivity {
         viewPager.setAdapter(pageAdapter);
         viewPager.setCurrentItem(stepRemoteId);
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }
