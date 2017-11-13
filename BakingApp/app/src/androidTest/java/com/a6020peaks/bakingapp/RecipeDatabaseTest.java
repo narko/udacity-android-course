@@ -74,6 +74,6 @@ public class RecipeDatabaseTest {
         List<StepEntry> steps = recipeWithSteps.getSteps();
         assertTrue(steps != null && steps.size() == 1);
         StepEntry fetchStep = steps.get(0);
-        assertThat(step.getId(), equalTo(fetchStep.getId()));
+        assertThat(step.getRemoteId(), equalTo(fetchStep.getRemoteId()));
     }
 }
