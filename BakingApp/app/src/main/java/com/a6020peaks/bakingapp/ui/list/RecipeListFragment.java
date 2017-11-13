@@ -3,7 +3,6 @@ package com.a6020peaks.bakingapp.ui.list;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -41,7 +40,7 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.OnItem
         mRecipeAdapter = new RecipeAdapter(this);
         mRecyclerView.setAdapter(mRecipeAdapter);
         if (getResources().getBoolean(R.bool.isTablet)) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            //getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         } else {
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

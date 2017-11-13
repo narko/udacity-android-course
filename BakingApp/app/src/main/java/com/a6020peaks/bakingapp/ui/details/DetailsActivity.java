@@ -2,7 +2,6 @@ package com.a6020peaks.bakingapp.ui.details;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -27,26 +26,31 @@ public class DetailsActivity extends AppCompatActivity implements OnStepItemClic
     private boolean mTwoPane = false;
     private ViewPager mViewPager;
     private RecipeDetailsFragmentViewModel mViewModel;
+    private int mRecipeId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getResources().getBoolean(R.bool.isTablet)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
+//        if (getResources().getBoolean(R.bool.isTablet)) {
+//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//        }
         setContentView(R.layout.activity_details);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mTwoPane = findViewById(R.id.stepPager) != null;
-        int recipeId = getIntent().getIntExtra(RECIPE_ID, 0);
+        if (savedInstanceState != null && savedInstanceState.containsKey(RECIPE_ID)) {
+            mRecipeId = savedInstanceState.getInt(RECIPE_ID);
+        } else {
+            mRecipeId = getIntent().getIntExtra(RECIPE_ID, 0);
+        }
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.details_fragment, RecipeDetailsFragment.create(recipeId))
+                .replace(R.id.details_fragment, RecipeDetailsFragment.create(mRecipeId))
                 .commit();
 
         if (mTwoPane) {
-            RecipeDetailsFragmentViewModelFactory factory = InjectorUtils.provideRecipeDetailsFragmentViewModelFactory(this, recipeId);
+            RecipeDetailsFragmentViewModelFactory factory = InjectorUtils.provideRecipeDetailsFragmentViewModelFactory(this, mRecipeId);
             mViewModel = ViewModelProviders.of(this, factory).get(RecipeDetailsFragmentViewModel.class);
             mViewModel.getSteps().observe(this, steps -> {
                 mViewPager = findViewById(R.id.stepPager);
@@ -70,5 +74,11 @@ public class DetailsActivity extends AppCompatActivity implements OnStepItemClic
             mViewPager.setCurrentItem(item.getRemoteId());
             mViewPager.getAdapter().notifyDataSetChanged();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(RECIPE_ID, mRecipeId);
     }
 }

@@ -61,11 +61,9 @@ public class StepDetailsFragment extends Fragment {
         if (!(getArguments() != null && getArguments().containsKey(STEP_ID))) {
             throw new RuntimeException("No step id given");
         }
-        initializePlayer();
         if (savedInstanceState != null && savedInstanceState.containsKey(position)) {
             videoPosition = savedInstanceState.getLong(position, C.TIME_UNSET);
         }
-
         int stepId = getArguments().getInt(STEP_ID);
         View rootView = inflater.inflate(R.layout.fragment_step_details, container, false);
 
@@ -79,11 +77,13 @@ public class StepDetailsFragment extends Fragment {
     }
 
     private void updateView(View rootView, StepEntry step) {
+        initializePlayer();
         // Prepare the MediaSource.
         String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
         Uri mediaUri = Uri.parse(step.getVideoUrl());
+        mPlayerView = rootView.findViewById(R.id.view_player);
+        mThumbView = rootView.findViewById(R.id.view_thumb);
         if (mediaUri != null) {
-            mPlayerView = rootView.findViewById(R.id.view_player);
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
                     new DefaultDataSourceFactory(getContext(), userAgent),
                     new DefaultExtractorsFactory(), null, null);
@@ -92,10 +92,10 @@ public class StepDetailsFragment extends Fragment {
             mExoPlayer.setPlayWhenReady(true);
             mExoPlayer.seekTo(videoPosition);
             mPlayerView.setVisibility(View.VISIBLE);
+            mThumbView.setVisibility(View.GONE);
             mPlayerView.setPlayer(mExoPlayer);
         } else { // No video available in JSON
             if (step.getThumbnailUrl() != null && !step.getThumbnailUrl().isEmpty()) {
-                mThumbView = rootView.findViewById(R.id.view_thumb);
                 mPlayerView.setVisibility(View.GONE);
                 mThumbView.setVisibility(View.VISIBLE);
                 Picasso.with(getContext()).load(step.getThumbnailUrl()).into(mThumbView);
