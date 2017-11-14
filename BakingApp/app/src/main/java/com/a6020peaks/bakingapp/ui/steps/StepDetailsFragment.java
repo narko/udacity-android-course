@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.a6020peaks.bakingapp.data.database.StepEntry;
 import com.a6020peaks.bakingapp.utils.InjectorUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -44,6 +46,8 @@ public class StepDetailsFragment extends Fragment {
     private ImageView mThumbView;
     private final String position = "position";
     private long videoPosition = C.TIME_UNSET;
+    private View mRootView;
+    private StepEntry mStep;
 
 
     public static StepDetailsFragment create(int stepId) {
@@ -65,48 +69,56 @@ public class StepDetailsFragment extends Fragment {
             videoPosition = savedInstanceState.getLong(position, C.TIME_UNSET);
         }
         int stepId = getArguments().getInt(STEP_ID);
-        View rootView = inflater.inflate(R.layout.fragment_step_details, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_step_details, container, false);
 
         StepDetailsFragmentViewModelFactory factory = InjectorUtils.provideStepDetailsFragmentViewModelFactory(getContext(), stepId);
         mViewModel = ViewModelProviders.of(this, factory).get(StepDetailsFragmentViewModel.class);
-        mViewModel.getStep().observe(this, step -> {
-            updateView(rootView, step);
-        });
+        registerStepObserver();
 
-        return rootView;
+        return mRootView;
     }
 
-    private void updateView(View rootView, StepEntry step) {
-        initializePlayer();
-        // Prepare the MediaSource.
-        String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
-        Uri mediaUri = Uri.parse(step.getVideoUrl());
-        mPlayerView = rootView.findViewById(R.id.view_player);
-        mThumbView = rootView.findViewById(R.id.view_thumb);
-        if (mediaUri != null) {
+    private void registerStepObserver() {
+        mViewModel.getStep().observe(this, step -> {
+            mStep = step;
+            updateView();
+        });
+    }
+
+    private void updateView() {
+
+        mPlayerView = mRootView.findViewById(R.id.view_player);
+        mThumbView = mRootView.findViewById(R.id.view_thumb);
+        if (!TextUtils.isEmpty(mStep.getVideoUrl())) {
+            Uri mediaUri = Uri.parse(mStep.getVideoUrl());
+            initializePlayer();
+            // Prepare the MediaSource.
+            String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
                     new DefaultDataSourceFactory(getContext(), userAgent),
                     new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             Log.d(TAG, "Playing " + mediaUri.toString());
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(false);
             mExoPlayer.seekTo(videoPosition);
             mPlayerView.setVisibility(View.VISIBLE);
             mThumbView.setVisibility(View.GONE);
             mPlayerView.setPlayer(mExoPlayer);
         } else { // No video available in JSON
-            if (step.getThumbnailUrl() != null && !step.getThumbnailUrl().isEmpty()) {
-                mPlayerView.setVisibility(View.GONE);
-                mThumbView.setVisibility(View.VISIBLE);
-                Picasso.with(getContext()).load(step.getThumbnailUrl()).into(mThumbView);
+            mPlayerView.setVisibility(View.GONE);
+            mThumbView.setVisibility(View.VISIBLE);
+            if (!TextUtils.isEmpty(mStep.getThumbnailUrl())) {
+                Picasso.with(getContext()).load(mStep.getThumbnailUrl()).error(R.drawable.default_placeholder).into(mThumbView);
+            } else {
+                Picasso.with(getContext()).load(R.drawable.default_placeholder).into(mThumbView);
             }
         }
 
-        if (rootView.findViewById(R.id.step_info) != null) {
-            TextView title = rootView.findViewById(R.id.step_title);
-            title.setText(step.getShortDescription());
-            TextView desc = rootView.findViewById(R.id.step_desc);
-            desc.setText(step.getDescription());
+        if (mRootView.findViewById(R.id.step_info) != null) {
+            TextView title = mRootView.findViewById(R.id.step_title);
+            title.setText(mStep.getShortDescription());
+            TextView desc = mRootView.findViewById(R.id.step_desc);
+            desc.setText(mStep.getDescription());
         }
     }
 
@@ -115,7 +127,8 @@ public class StepDetailsFragment extends Fragment {
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(
+                    new DefaultRenderersFactory(getContext()), trackSelector, loadControl);
         }
     }
 
@@ -129,24 +142,29 @@ public class StepDetailsFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        Log.d(TAG, "onDetach");
         super.onDetach();
         releasePlayer();
     }
 
     @Override
     public void onDestroyView() {
+        Log.d(TAG, "onDestroyView");
         super.onDestroyView();
         releasePlayer();
     }
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
         initializePlayer();
+        registerStepObserver();
     }
 
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause");
         super.onPause();
         saveState();
         releasePlayer();
@@ -154,12 +172,14 @@ public class StepDetailsFragment extends Fragment {
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop");
         super.onStop();
         releasePlayer();
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         releasePlayer();
     }
