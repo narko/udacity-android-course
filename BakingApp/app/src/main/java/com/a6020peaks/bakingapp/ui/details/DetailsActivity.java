@@ -23,10 +23,12 @@ import com.a6020peaks.bakingapp.utils.InjectorUtils;
 public class DetailsActivity extends AppCompatActivity implements OnStepItemClickListener {
     private static final String TAG = DetailsActivity.class.getSimpleName();
     public static final String RECIPE_ID = "recipe_id";
+    public static final String FRAGMENT = "fragment";
     private boolean mTwoPane = false;
     private ViewPager mViewPager;
     private RecipeDetailsFragmentViewModel mViewModel;
     private int mRecipeId;
+    private RecipeDetailsFragment mFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,13 +42,15 @@ public class DetailsActivity extends AppCompatActivity implements OnStepItemClic
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mTwoPane = findViewById(R.id.stepPager) != null;
-        if (savedInstanceState != null && savedInstanceState.containsKey(RECIPE_ID)) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(FRAGMENT) && savedInstanceState.containsKey(RECIPE_ID)) {
+            mFragment = (RecipeDetailsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT);
             mRecipeId = savedInstanceState.getInt(RECIPE_ID);
         } else {
             mRecipeId = getIntent().getIntExtra(RECIPE_ID, 0);
+            mFragment = RecipeDetailsFragment.create(mRecipeId);
         }
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.details_fragment, RecipeDetailsFragment.create(mRecipeId))
+                .replace(R.id.details_fragment, mFragment)
                 .commit();
 
         if (mTwoPane) {
@@ -79,6 +83,7 @@ public class DetailsActivity extends AppCompatActivity implements OnStepItemClic
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(RECIPE_ID, mRecipeId);
+        getSupportFragmentManager().putFragment(outState, FRAGMENT, mFragment);
         super.onSaveInstanceState(outState);
     }
 

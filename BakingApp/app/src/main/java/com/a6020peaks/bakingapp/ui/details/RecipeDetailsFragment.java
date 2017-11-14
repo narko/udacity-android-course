@@ -3,6 +3,7 @@ package com.a6020peaks.bakingapp.ui.details;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,10 +23,12 @@ import com.a6020peaks.bakingapp.utils.InjectorUtils;
 public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdapter.OnStepItemClickListener {
     private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
     private static final String RECIPE_ID = "recipe_id";
+    private static final String RECYCLER_STATE = "recycler_state";
     private RecyclerView mDetailsRv;
     private RecipeDetailsAdapter mAdapter;
     private RecipeDetailsFragmentViewModel mViewModel;
     private int mStepAmount;
+    private Parcelable recyclerState;
 
     private OnStepItemClickListener mOnStepItemClickListener;
 
@@ -67,6 +70,10 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
         mAdapter = new RecipeDetailsAdapter(this);
         mDetailsRv.setAdapter(mAdapter);
 
+        if (savedInstanceState != null && savedInstanceState.containsKey(RECYCLER_STATE)) {
+            recyclerState = savedInstanceState.getBundle(RECYCLER_STATE);
+        }
+
         RecipeDetailsFragmentViewModelFactory factory = InjectorUtils
                 .provideRecipeDetailsFragmentViewModelFactory(getContext(), recipeId);
         mViewModel = ViewModelProviders.of(this, factory).get(RecipeDetailsFragmentViewModel.class);
@@ -81,6 +88,9 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
         mViewModel.getSteps().observe(this, steps -> {
             mStepAmount = steps != null ? steps.size() : 0;
             mAdapter.swapSteps(steps);
+            if (recyclerState != null) {
+                mDetailsRv.getLayoutManager().onRestoreInstanceState(recyclerState);
+            }
         });
 
         return rootView;
@@ -90,4 +100,12 @@ public class RecipeDetailsFragment extends Fragment implements RecipeDetailsAdap
     public void onStepItemClick(StepEntry item) {
         mOnStepItemClickListener.onStepItemClick(item, mStepAmount);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(RECYCLER_STATE, mDetailsRv.getLayoutManager().onSaveInstanceState());
+        super.onSaveInstanceState(outState);
+    }
+
 }
