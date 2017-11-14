@@ -26,8 +26,10 @@ public class RecipeListTest {
     public ActivityTestRule<MainActivity> rule = new ActivityTestRule(MainActivity.class);
 
     @Test
-    public void clickRecipe_OpensDetailsActivity() {
+    public void clickRecipe_OpensDetailsActivity() throws Exception {
         onView(withId(R.id.recipe_rv)).perform(actionOnItemAtPosition(0, click()));
+        // The test seems to run fine on Nexus 4, but not on other devices. Let's delay a bit.
+        Thread.sleep(2000);
         onView(withId(R.id.recipe_details_rv)).check(matches(isDisplayed()));
     }
 }
