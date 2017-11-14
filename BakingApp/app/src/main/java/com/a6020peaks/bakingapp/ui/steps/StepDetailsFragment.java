@@ -148,6 +148,7 @@ public class StepDetailsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        saveState();
         releasePlayer();
     }
 
@@ -166,9 +167,13 @@ public class StepDetailsFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        saveState();
+        outState.putLong(position, videoPosition);
+    }
+
+    private void saveState() {
         if (mExoPlayer != null) {
             videoPosition = mExoPlayer.getCurrentPosition();
-            outState.putLong(position, videoPosition);
         }
     }
 }
