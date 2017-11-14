@@ -29,7 +29,9 @@ public class RecipeListTest {
     public void clickRecipe_OpensDetailsActivity() throws Exception {
         onView(withId(R.id.recipe_rv)).perform(actionOnItemAtPosition(0, click()));
         // The test seems to run fine on Nexus 4, but not on other devices. Let's delay a bit.
-        Thread.sleep(2000);
+        // TODO how to do this with espresso?
+        // https://stackoverflow.com/questions/29250506/espresso-how-to-check-if-one-of-the-view-is-displayed
+        Thread.sleep(5000);
         onView(withId(R.id.recipe_details_rv)).check(matches(isDisplayed()));
     }
 }
